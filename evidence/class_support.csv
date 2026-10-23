@@ -1,0 +1,16 @@
+class,train,validation,test,evaluation_note
+BENIGN,1218005,400247,417513,Held-out examples are present.
+Bot,1327,443,442,Held-out examples are present.
+DDoS,39571,13191,13190,Held-out examples are present.
+DoS GoldenEye,6865,1935,1935,Held-out examples are present.
+DoS Hulk,92460,30820,30820,Held-out examples are present.
+DoS Slowhttptest,6162,1305,1305,Held-out examples are present.
+DoS slowloris,8659,693,692,Held-out examples are present.
+FTP-Patator,1831,611,611,Held-out examples are present.
+Heartbleed,20,0,0,A held-out score is unavailable where support is zero.
+Infiltration,58,11,13,Held-out examples are present.
+PortScan,95390,31796,31800,Held-out examples are present.
+SSH-Patator,2115,705,705,Held-out examples are present.
+Web Attack – Brute Force,189,63,63,Held-out examples are present.
+Web Attack – Sql Injection,5,2,2,Held-out examples are present.
+Web Attack – XSS,55,19,18,Held-out examples are present.

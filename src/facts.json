@@ -1,0 +1,485 @@
+{
+  "dataset": {
+    "preparedRows": 2506919,
+    "labeledRows": 2453662,
+    "unlabeledRows": 53257,
+    "trainingClasses": 15,
+    "evaluatedClasses": 14,
+    "rawColumns": 47,
+    "preparedColumns": 19,
+    "baselinePredictors": 15,
+    "splitColumns": 23,
+    "heartbleedWindows": 20,
+    "baselineFeatures": [
+      "protocol",
+      "duration_seconds",
+      "packet_count",
+      "total_bytes",
+      "mean_packet_bytes",
+      "min_packet_bytes",
+      "max_packet_bytes",
+      "forward_packet_count",
+      "backward_packet_count",
+      "forward_bytes",
+      "backward_bytes",
+      "syn_count",
+      "ack_count",
+      "fin_count",
+      "rst_count"
+    ]
+  },
+  "split": {
+    "id": "split_68ab64fbdd2b",
+    "folds": 3,
+    "groups": 991134,
+    "parts": [
+      {
+        "name": "train",
+        "rows": 1472712,
+        "share": 0.6002098088489776
+      },
+      {
+        "name": "validation",
+        "rows": 481841,
+        "share": 0.19637627350466363
+      },
+      {
+        "name": "test",
+        "rows": 499109,
+        "share": 0.2034139176463588
+      }
+    ],
+    "heartbleedPolicy": "All 20 custom Heartbleed windows belong to one conversation and stay on fitting sides. Independent validation/test scores are N/A."
+  },
+  "models": [
+    {
+      "name": "A",
+      "features": 15,
+      "featureDescription": "Original 15 predictors",
+      "weight": "None",
+      "depth": 12,
+      "leaf": 2,
+      "validationMacroF1": 0.6181677550509982,
+      "validationAccuracy": 0.9939025529168336,
+      "validationFalseAlarmRate": 0.0041174574700122675,
+      "cvMacroF1": 0.5900162995194326,
+      "cvSd": 0.067692960354492,
+      "selected": false,
+      "notes": "All models use 80 trees and seed 42."
+    },
+    {
+      "name": "B",
+      "features": 15,
+      "featureDescription": "Original 15 predictors",
+      "weight": "Balanced",
+      "depth": 12,
+      "leaf": 2,
+      "validationMacroF1": 0.7412991547817777,
+      "validationAccuracy": 0.9935663424241606,
+      "validationFalseAlarmRate": 0.007118104570427761,
+      "cvMacroF1": 0.6537356009358827,
+      "cvSd": 0.08010887347210258,
+      "selected": false,
+      "notes": "All models use 80 trees and seed 42."
+    },
+    {
+      "name": "C",
+      "features": 19,
+      "featureDescription": "15 original predictors + 4 calculated values",
+      "weight": "Balanced",
+      "depth": 12,
+      "leaf": 2,
+      "validationMacroF1": 0.7402119114753775,
+      "validationAccuracy": 0.9932799408933652,
+      "validationFalseAlarmRate": 0.007537845380477555,
+      "cvMacroF1": 0.660975600848486,
+      "cvSd": 0.08668207620224483,
+      "selected": false,
+      "notes": "All models use 80 trees and seed 42."
+    },
+    {
+      "name": "D",
+      "features": 8,
+      "featureDescription": "8 selected from the original 15",
+      "weight": "Balanced",
+      "depth": 12,
+      "leaf": 2,
+      "validationMacroF1": 0.7393422041378234,
+      "validationAccuracy": 0.9927195900722438,
+      "validationFalseAlarmRate": 0.008072515221850507,
+      "cvMacroF1": 0.6068875855794945,
+      "cvSd": 0.11461996188700309,
+      "selected": false,
+      "notes": "All models use 80 trees and seed 42."
+    },
+    {
+      "name": "E",
+      "features": 12,
+      "featureDescription": "12 selected from the expanded 19",
+      "weight": "Balanced",
+      "depth": 12,
+      "leaf": 2,
+      "validationMacroF1": 0.721028899274233,
+      "validationAccuracy": 0.9926967609647166,
+      "validationFalseAlarmRate": 0.008244908768835244,
+      "cvMacroF1": 0.6502730489099036,
+      "cvSd": 0.11131884610216489,
+      "selected": false,
+      "notes": "All models use 80 trees and seed 42."
+    },
+    {
+      "name": "W1",
+      "features": 15,
+      "featureDescription": "Original 15 predictors",
+      "weight": "Square root of balanced",
+      "depth": 12,
+      "leaf": 2,
+      "validationMacroF1": 0.7500635060782894,
+      "validationAccuracy": 0.9948426970722707,
+      "validationFalseAlarmRate": 0.005579054933578516,
+      "cvMacroF1": null,
+      "cvSd": null,
+      "selected": false,
+      "notes": "CV Not run: this trial was not shortlisted."
+    },
+    {
+      "name": "T1",
+      "features": 15,
+      "featureDescription": "Original 15 predictors",
+      "weight": "Balanced",
+      "depth": 20,
+      "leaf": 2,
+      "validationMacroF1": 0.7774609109234036,
+      "validationAccuracy": 0.9949443903694373,
+      "validationFalseAlarmRate": 0.005634020992037417,
+      "cvMacroF1": 0.714279003730609,
+      "cvSd": 0.08490393370391222,
+      "selected": true,
+      "notes": "All models use 80 trees and seed 42."
+    },
+    {
+      "name": "T2",
+      "features": 15,
+      "featureDescription": "Original 15 predictors",
+      "weight": "Balanced",
+      "depth": 12,
+      "leaf": 1,
+      "validationMacroF1": 0.7359706769349444,
+      "validationAccuracy": 0.9936638849745041,
+      "validationFalseAlarmRate": 0.007063138511968859,
+      "cvMacroF1": null,
+      "cvSd": null,
+      "selected": false,
+      "notes": "CV Not run: this trial was not shortlisted."
+    },
+    {
+      "name": "T3",
+      "features": 15,
+      "featureDescription": "Original 15 predictors",
+      "weight": "Balanced",
+      "depth": 20,
+      "leaf": 1,
+      "validationMacroF1": 0.7738440334807801,
+      "validationAccuracy": 0.9949485411162603,
+      "validationFalseAlarmRate": 0.005576556476375838,
+      "cvMacroF1": 0.7132582575872101,
+      "cvSd": 0.08207058330956568,
+      "selected": false,
+      "notes": "All models use 80 trees and seed 42."
+    }
+  ],
+  "test": {
+    "model": "T1",
+    "rows": 499109,
+    "date": "2026-10-21",
+    "macroF1": 0.8577381515094958,
+    "accuracy": 0.9951493561526641,
+    "precision": 0.8468051690619737,
+    "recall": 0.8905623371227994,
+    "kappa": 0.9835602500068606,
+    "falseAlarms": 2218,
+    "benignRows": 417513,
+    "falseAlarmRate": 0.005312409433957745,
+    "perClass": [
+      {
+        "label": "BENIGN",
+        "support": 417513,
+        "precision": 0.9998483236148094,
+        "recall": 0.9946875905660423,
+        "f1": 0.9972612805584539
+      },
+      {
+        "label": "Bot",
+        "support": 442,
+        "precision": 0.4579339723109691,
+        "recall": 0.9728506787330317,
+        "f1": 0.6227371469949312
+      },
+      {
+        "label": "DDoS",
+        "support": 13190,
+        "precision": 0.9980300045461433,
+        "recall": 0.9986353297952995,
+        "f1": 0.9983325754130665
+      },
+      {
+        "label": "DoS GoldenEye",
+        "support": 1935,
+        "precision": 0.9474987617632491,
+        "recall": 0.9886304909560724,
+        "f1": 0.9676277187658068
+      },
+      {
+        "label": "DoS Hulk",
+        "support": 30820,
+        "precision": 0.9997076023391813,
+        "recall": 0.9984101232965606,
+        "f1": 0.9990584415584416
+      },
+      {
+        "label": "DoS Slowhttptest",
+        "support": 1305,
+        "precision": 0.9483282674772037,
+        "recall": 0.9563218390804598,
+        "f1": 0.9523082792827166
+      },
+      {
+        "label": "DoS slowloris",
+        "support": 692,
+        "precision": 0.9637377963737797,
+        "recall": 0.9985549132947977,
+        "f1": 0.9808374733853797
+      },
+      {
+        "label": "FTP-Patator",
+        "support": 611,
+        "precision": 0.9983633387888707,
+        "recall": 0.9983633387888707,
+        "f1": 0.9983633387888707
+      },
+      {
+        "label": "Heartbleed",
+        "support": 0,
+        "precision": null,
+        "recall": null,
+        "f1": null
+      },
+      {
+        "label": "Infiltration",
+        "support": 13,
+        "precision": 0.625,
+        "recall": 0.38461538461538464,
+        "f1": 0.47619047619047616
+      },
+      {
+        "label": "PortScan",
+        "support": 31800,
+        "precision": 0.9530346171137419,
+        "recall": 0.999937106918239,
+        "f1": 0.9759226578684876
+      },
+      {
+        "label": "SSH-Patator",
+        "support": 705,
+        "precision": 1.0,
+        "recall": 0.9943262411347518,
+        "f1": 0.9971550497866287
+      },
+      {
+        "label": "Web Attack – Brute Force",
+        "support": 63,
+        "precision": 0.6825396825396826,
+        "recall": 0.6825396825396826,
+        "f1": 0.6825396825396826
+      },
+      {
+        "label": "Web Attack – Sql Injection",
+        "support": 2,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0
+      },
+      {
+        "label": "Web Attack – XSS",
+        "support": 18,
+        "precision": 0.28125,
+        "recall": 0.5,
+        "f1": 0.36
+      }
+    ]
+  },
+  "official": {
+    "eligibleRows": 1126067,
+    "scoredRows": 1126058,
+    "groups": 536179,
+    "heartbleedFlows": 9,
+    "arms": [
+      {
+        "id": "flow_analogs_15",
+        "title": "15 official flow analogs",
+        "features": 15,
+        "macroF1": 0.804194478857395,
+        "sd": 0.02977560263585859,
+        "falseAlarmRate": 0.0033092289257429,
+        "accuracy": 0.9939575555472544,
+        "kappa": 0.9729613966377645,
+        "fitSeconds": 145.6339316360004,
+        "predictionSeconds": 2.247846612000103,
+        "falseAlarms": 3154,
+        "errors": 6367
+      },
+      {
+        "id": "fuller_official",
+        "title": "77 official traffic measurements",
+        "features": 77,
+        "macroF1": 0.8198235744458914,
+        "sd": 0.014296044729177112,
+        "falseAlarmRate": 0.0011011465695906668,
+        "accuracy": 0.996710314890839,
+        "kappa": 0.9852635085963568,
+        "fitSeconds": 422.69566807200044,
+        "predictionSeconds": 3.0614562539999497,
+        "falseAlarms": 1057,
+        "errors": 3437
+      }
+    ],
+    "gain": 0.015629095588496345,
+    "pairedFoldGains": [
+      0.0046655106702425675,
+      0.03405485127328356,
+      0.008166924821962906
+    ],
+    "correctedErrors": 3107,
+    "introducedErrors": 177,
+    "rareClasses": [
+      {
+        "label": "Heartbleed",
+        "support": 0,
+        "f1": null
+      },
+      {
+        "label": "Infiltration",
+        "support": 25,
+        "f1": 0.0
+      },
+      {
+        "label": "Web Attack – Sql Injection",
+        "support": 5,
+        "f1": 0.0
+      },
+      {
+        "label": "Web Attack – XSS",
+        "support": 15,
+        "f1": 0.7367724867724869
+      }
+    ],
+    "notes": [
+      "Both feature sets use the same eligible official flow records and three saved training folds.",
+      "Fixed T1 settings: 80 trees, depth 20, minimum leaf size 2, balanced weights, seed 42, two CPU workers.",
+      "Median imputation and class weights are fitted using only the current fitting side.",
+      "The 15 flow analogs approximate our design on official flows; they are different inputs from T1’s custom windows.",
+      "Three folds show a consistent direction here; they do not establish statistical certainty.",
+      "The cohort is filtered. Its scores describe retained records, not the complete official dataset.",
+      "No replacement model was selected and the frozen T1 final test was not repeated.",
+      "False-alarm rates shown here are unweighted fold means; counts below are pooled across folds.",
+      "Prediction time includes imputation, uses three repeats after a warm-up, and excludes loading, feature construction, and scoring."
+    ]
+  },
+  "classSupport": [
+    {
+      "label": "BENIGN",
+      "train": 1218005,
+      "validation": 400247,
+      "test": 417513
+    },
+    {
+      "label": "Bot",
+      "train": 1327,
+      "validation": 443,
+      "test": 442
+    },
+    {
+      "label": "DDoS",
+      "train": 39571,
+      "validation": 13191,
+      "test": 13190
+    },
+    {
+      "label": "DoS GoldenEye",
+      "train": 6865,
+      "validation": 1935,
+      "test": 1935
+    },
+    {
+      "label": "DoS Hulk",
+      "train": 92460,
+      "validation": 30820,
+      "test": 30820
+    },
+    {
+      "label": "DoS Slowhttptest",
+      "train": 6162,
+      "validation": 1305,
+      "test": 1305
+    },
+    {
+      "label": "DoS slowloris",
+      "train": 8659,
+      "validation": 693,
+      "test": 692
+    },
+    {
+      "label": "FTP-Patator",
+      "train": 1831,
+      "validation": 611,
+      "test": 611
+    },
+    {
+      "label": "Heartbleed",
+      "train": 20,
+      "validation": 0,
+      "test": 0
+    },
+    {
+      "label": "Infiltration",
+      "train": 58,
+      "validation": 11,
+      "test": 13
+    },
+    {
+      "label": "PortScan",
+      "train": 95390,
+      "validation": 31796,
+      "test": 31800
+    },
+    {
+      "label": "SSH-Patator",
+      "train": 2115,
+      "validation": 705,
+      "test": 705
+    },
+    {
+      "label": "Web Attack – Brute Force",
+      "train": 189,
+      "validation": 63,
+      "test": 63
+    },
+    {
+      "label": "Web Attack – Sql Injection",
+      "train": 5,
+      "validation": 2,
+      "test": 2
+    },
+    {
+      "label": "Web Attack – XSS",
+      "train": 55,
+      "validation": 19,
+      "test": 18
+    }
+  ],
+  "provenance": {
+    "sourceRevision": "5170ec1458c05dd8fe230cccb157a52af47fb1b4",
+    "reviewedDate": "2026-10-23",
+    "sourceRepository": "https://github.com/xtian413/CICIDS2017-Attack-Classification"
+  }
+}

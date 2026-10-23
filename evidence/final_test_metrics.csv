@@ -1,0 +1,2 @@
+accuracy,supported_class_macro_f1,supported_class_macro_precision,supported_class_macro_recall,kappa,benign_false_alarms,benign_rows,benign_false_alarm_rate,supported_classes
+0.9951493561526641,0.8577381515094958,0.8468051690619737,0.8905623371227994,0.9835602500068606,2218,417513,0.005312409433957745,14

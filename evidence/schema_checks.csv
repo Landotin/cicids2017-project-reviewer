@@ -1,0 +1,11 @@
+day,stage,actual_columns,expected_columns,status
+Monday,annotated_packet,47,47,PASS
+Monday,prepared_window,19,19,PASS
+Tuesday,annotated_packet,47,47,PASS
+Tuesday,prepared_window,19,19,PASS
+Wednesday,annotated_packet,47,47,PASS
+Wednesday,prepared_window,19,19,PASS
+Thursday,annotated_packet,47,47,PASS
+Thursday,prepared_window,19,19,PASS
+Friday,annotated_packet,47,47,PASS
+Friday,prepared_window,19,19,PASS

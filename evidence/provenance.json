@@ -1,0 +1,78 @@
+{
+  "reviewed_date": "2026-10-23",
+  "source_repository": "https://github.com/xtian413/CICIDS2017-Attack-Classification",
+  "source_revision": "5170ec1458c05dd8fe230cccb157a52af47fb1b4",
+  "scope": "Reviewed aggregate measurements only; no packet records, connection identifiers, credentials, or model binaries.",
+  "files": [
+    {
+      "file": "v1_validation.csv",
+      "source_path": "results/v1/validation_all_candidates.csv",
+      "sha256": "ee6863d19649b1f1a4ee03fa72dccb630fd0b88a7f9debf855b94db753fd0dae"
+    },
+    {
+      "file": "v1_cv.csv",
+      "source_path": "results/v1/cv_summary.csv",
+      "sha256": "b856cce24d5cb138cf2b2a57e5f9d6dde685b5b0414d72adcbf324aacf90ddec"
+    },
+    {
+      "file": "class_support.csv",
+      "source_path": "results/v1/class_support.csv",
+      "sha256": "113c984c71ca66c6207920327b3322a642ba0993d202ec08fb0a34c5ff772a93"
+    },
+    {
+      "file": "custom_validation.csv",
+      "source_path": "results/v2/tables/comparison_validation_all_models_2026-10-21.csv",
+      "sha256": "411bdacf9f61103ae09de6a04a843d5f1859fb2286c61728872a0cad94299b3d"
+    },
+    {
+      "file": "custom_ranking.csv",
+      "source_path": "results/v2/tables/comparison_eligible_model_ranking_2026-10-21.csv",
+      "sha256": "36fc0f6b6a17ed9b4ae242ecae963b114bc934be6271700f3c60c53e0669041c"
+    },
+    {
+      "file": "custom_cv_folds.csv",
+      "source_path": "results/v2/tables/comparison_cv_new_trial_folds_2026-10-21.csv",
+      "sha256": "ab7455019c7bb0d135f0bd43e6748cc59f91a59cf1fe98eaad27e778dd835ab0"
+    },
+    {
+      "file": "final_test_metrics.csv",
+      "source_path": "results/v2/tables/final_test_metrics_2026-10-21.csv",
+      "sha256": "fa9ba370062a4ec65f396121b1ca27fe58d32c0652bfba72ef00f3397f9385fc"
+    },
+    {
+      "file": "final_test_per_class.csv",
+      "source_path": "results/v2/tables/final_test_per_class_2026-10-21.csv",
+      "sha256": "8b85b3438e567adbb7f8389e6d57ebaa26053f034708cd3fd5b3f433f364d138"
+    },
+    {
+      "file": "official_summary.csv",
+      "source_path": "results/official_features/tables/summary_metrics.csv",
+      "sha256": "90bf89cb3e83f91e64bfee3c259c1c9368ba94796f476095cb4aa2e380ffa017"
+    },
+    {
+      "file": "official_folds.csv",
+      "source_path": "results/official_features/Comparison/fold_scores.csv",
+      "sha256": "edc63f3f586d25eb3c879384ecf7f6d74d7aad84ab7bf6cd51e57ffa677e362f"
+    },
+    {
+      "file": "official_class_f1.csv",
+      "source_path": "results/official_features/tables/class_mean_f1.csv",
+      "sha256": "ec9bcf4628816c89f041ce5725feb24d579d133807255cc635a9aec4e3a16e44"
+    },
+    {
+      "file": "official_paired_folds.csv",
+      "source_path": "results/official_features/Comparison/paired_fold_differences.csv",
+      "sha256": "bc0552602b9a0e395a24a5b49126a7b1278682b9b011983527fa9031abbeb7a9"
+    },
+    {
+      "file": "partition_summary.csv",
+      "source_path": "results/official_features/Schema/partition_summary.csv",
+      "sha256": "46ba9eda7bfa595e9d8c5257b2f119221af13ec7cd9cbd316ccc328de5418ab6"
+    },
+    {
+      "file": "schema_checks.csv",
+      "source_path": "results/official_features/Schema/schema_checks.csv",
+      "sha256": "0aff1dfcf8dd0fb38d2c8cdc17ce102668b7c9abb2c3c87ca2d1e80f19b1f122"
+    }
+  ]
+}

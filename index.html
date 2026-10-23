@@ -1,0 +1,1108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>CICIDS2017 project reviewer</title>
+  <style>
+    :root {
+      --paper: #f6f2e9;
+      --paper-light: #fffdf8;
+      --paper-deep: #e9e2d5;
+      --ink: #172b3d;
+      --ink-soft: #415565;
+      --muted: #53636e;
+      --line: #d9d4c9;
+      --coral: #aa4538;
+      --coral-pale: #f4dfd8;
+      --teal: #267574;
+      --teal-pale: #dcebe6;
+      --gold: #947032;
+      --shadow: 0 18px 55px rgba(23, 43, 61, .08);
+      --serif: Georgia, "Times New Roman", serif;
+      --sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: var(--sans);
+      color: var(--ink);
+      background: var(--paper);
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; min-width: 320px; background: var(--paper); line-height: 1.55; }
+    button, input { font: inherit; }
+    button { color: inherit; }
+    a { color: var(--teal); text-underline-offset: .18em; }
+    a:hover { color: var(--coral); }
+    :focus-visible { outline: 3px solid var(--coral); outline-offset: 3px; border-radius: 3px; }
+    .page { width: min(1220px, calc(100% - 48px)); margin: 0 auto; }
+    .masthead { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 26px; padding: 28px 0 24px; border-bottom: 1px solid var(--line); }
+    .brand-mark { display: grid; place-items: center; width: 58px; height: 58px; border: 1px solid var(--ink); border-radius: 50%; color: var(--coral); font: 700 1.02rem var(--serif); letter-spacing: -.06em; text-decoration: none; flex: 0 0 auto; }
+    .eyebrow, .kicker, .micro-label { margin: 0; color: var(--teal); font-size: .71rem; font-weight: 800; letter-spacing: .13em; line-height: 1.35; text-transform: uppercase; }
+    .masthead h1 { margin: 5px 0 0; font: 700 clamp(1.45rem, 2.6vw, 2rem)/1.08 var(--serif); letter-spacing: -.035em; }
+    .masthead .subline { margin: 5px 0 0; color: var(--muted); font-size: .88rem; }
+    .header-actions { display: flex; gap: 9px; align-items: center; justify-content: flex-end; }
+    .button { min-height: 42px; padding: 9px 15px; border: 1px solid var(--ink); border-radius: 2px; background: transparent; color: var(--ink); font-size: .85rem; font-weight: 700; cursor: pointer; transition: background-color .18s ease, color .18s ease, transform .18s ease; }
+    .button:hover { background: var(--ink); color: white; }
+    .button:active { transform: translateY(1px); }
+    .button.primary { border-color: var(--teal); background: var(--teal); color: white; }
+    .button.primary:hover { border-color: var(--ink); background: var(--ink); }
+    .button.small { min-height: 36px; padding: 6px 11px; font-size: .79rem; }
+    .topnav { position: sticky; top: 0; z-index: 10; margin: 0 calc((100vw - min(1220px, 100vw - 48px)) / -2); padding: 11px max(24px, calc((100vw - 1220px) / 2)); border-bottom: 1px solid var(--line); background: rgba(246, 242, 233, .96); backdrop-filter: blur(10px); }
+    .tablist { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; max-width: 690px; margin: 0 auto; }
+    .tab { position: relative; min-height: 46px; padding: 9px 12px; border: 0; border-radius: 3px; background: transparent; color: var(--ink-soft); font-size: .87rem; font-weight: 750; cursor: pointer; }
+    .tab::after { position: absolute; right: 14px; bottom: 0; left: 14px; height: 3px; background: transparent; content: ""; }
+    .tab[aria-selected="true"] { color: var(--ink); }
+    .tab[aria-selected="true"]::after { background: var(--coral); }
+    .tab:hover { background: rgba(255,255,255,.55); }
+    main { min-height: 65vh; padding: 34px 0 80px; }
+    .tab-panel { scroll-margin-top: 82px; animation: arrive .28s ease both; }
+    @keyframes arrive { from { opacity: .55; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+    .page-intro { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(210px, .65fr); align-items: end; gap: 32px; margin: 8px 0 38px; }
+    .page-intro h2, .project-title { max-width: 800px; margin: 8px 0 12px; font: 700 clamp(2.2rem, 5vw, 4.3rem)/1.01 var(--serif); letter-spacing: -.052em; }
+    .page-intro .lede { max-width: 720px; margin: 0; color: var(--ink-soft); font-size: 1.04rem; }
+    .intro-note { padding: 16px 17px; border-left: 3px solid var(--coral); background: var(--paper-light); color: var(--ink-soft); font-size: .88rem; }
+    .intro-note strong { display: block; margin-bottom: 3px; color: var(--ink); font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; }
+    .section-head { display: flex; justify-content: space-between; align-items: end; gap: 20px; margin: 48px 0 18px; }
+    .section-head h3 { margin: 3px 0 0; font: 700 clamp(1.55rem, 3vw, 2.25rem)/1.12 var(--serif); letter-spacing: -.03em; }
+    .section-head p { max-width: 530px; margin: 0; color: var(--muted); font-size: .89rem; }
+    .section-tag { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-size: .73rem; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+    .section-tag::before { width: 21px; height: 1px; background: var(--coral); content: ""; }
+    .paper-card { border: 1px solid var(--line); background: var(--paper-light); box-shadow: 0 8px 28px rgba(23,43,61,.035); }
+    .story-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+    .story-card { min-height: 178px; padding: 21px; border-top: 3px solid var(--teal); }
+    .story-card:nth-child(3n + 2) { border-top-color: var(--coral); }
+    .story-card .index { color: var(--coral); font: 700 .82rem var(--serif); }
+    .story-card h4 { margin: 7px 0 9px; font: 700 1.28rem/1.15 var(--serif); }
+    .story-card p { margin: 0; color: var(--ink-soft); font-size: .9rem; }
+    .story-card .prompt { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); color: var(--teal); font-size: .81rem; font-weight: 700; }
+    .facts-strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; overflow: hidden; border: 1px solid var(--line); background: var(--line); }
+    .fact-cell { min-height: 106px; padding: 15px 17px; background: var(--paper-light); }
+    .fact-cell .value { display: block; color: var(--ink); font: 700 1.6rem/1.1 var(--serif); font-variant-numeric: tabular-nums; }
+    .fact-cell .label { display: block; margin-top: 6px; color: var(--muted); font-size: .75rem; }
+    .feature-scope-note { margin-top: 10px; padding: 15px 18px; border-left: 3px solid var(--coral); color: var(--ink-soft); font-size: .85rem; }
+    .feature-scope-note strong { color: var(--ink); }
+    .feature-scope-note details { margin-top: 8px; }
+    .feature-scope-note summary { color: var(--teal); font-size: .76rem; font-weight: 800; cursor: pointer; }
+    .feature-name-list { display: flex; flex-wrap: wrap; gap: 5px; margin: 9px 0 0; padding: 0; list-style: none; }
+    .feature-name-list li { padding: 4px 7px; background: #f1eee6; color: var(--ink-soft); font: .7rem ui-monospace, SFMono-Regular, Consolas, monospace; }
+    .stage-flow { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+    .stage-button { position: relative; min-height: 138px; padding: 15px 14px; border: 1px solid var(--line); background: var(--paper-light); text-align: left; cursor: pointer; transition: border-color .18s ease, background .18s ease, transform .18s ease; }
+    .stage-button:hover { transform: translateY(-2px); border-color: var(--teal); }
+    .stage-button[aria-pressed="true"] { border-color: var(--teal); background: var(--teal-pale); box-shadow: inset 0 0 0 1px var(--teal); }
+    .stage-button .stage-number { display: block; margin-bottom: 9px; color: var(--coral); font: 700 .81rem var(--serif); }
+    .stage-button strong { display: block; font: 700 1.1rem/1.1 var(--serif); }
+    .stage-button small { display: block; margin-top: 8px; color: var(--muted); font-size: .75rem; line-height: 1.3; }
+    .stage-details { margin-top: 12px; }
+    .stage-detail { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 24px; padding: 22px; border-left: 3px solid var(--teal); }
+    .stage-detail h4 { margin: 4px 0 8px; font: 700 1.55rem/1.15 var(--serif); }
+    .stage-detail p { margin: 0 0 9px; color: var(--ink-soft); }
+    .stage-detail .stage-rowmeaning { font-size: .87rem; }
+    .stage-detail .stage-explanation { padding-left: 20px; border-left: 1px solid var(--line); }
+    .stage-detail .stage-explanation p:last-child { margin-bottom: 0; }
+    .example-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .example-card { padding: 22px; }
+    .toy-label { display: inline-flex; align-items: center; min-height: 25px; padding: 4px 8px; border: 1px solid #d4a699; background: var(--coral-pale); color: #7c3f35; font-size: .68rem; font-weight: 850; letter-spacing: .09em; text-transform: uppercase; }
+    .example-card h4 { margin: 11px 0 6px; font: 700 1.4rem/1.15 var(--serif); }
+    .example-card > p { margin: 0 0 17px; color: var(--ink-soft); font-size: .88rem; }
+    .toy-flow { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 9px; min-height: 96px; margin: 14px 0; }
+    .toy-stack { display: grid; gap: 5px; }
+    .toy-chip { display: block; padding: 7px 9px; border: 1px dashed #9ca8a8; background: #f4f6f2; color: var(--ink-soft); font: 600 .75rem/1.25 ui-monospace, SFMono-Regular, Consolas, monospace; }
+    .toy-arrow { color: var(--coral); font-size: 1.35rem; font-weight: 800; }
+    .toy-output { padding: 12px; border: 1px solid #a8c6bc; background: var(--teal-pale); color: #174b49; font-size: .78rem; opacity: 1; transition: opacity .2s ease, transform .2s ease; }
+    .toy-output.is-shown { opacity: 1; transform: translateY(-1px); }
+    .toy-output strong { display: block; margin-bottom: 5px; font-size: .8rem; }
+    .group-toy { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; margin: 15px 0; }
+    .group-box { min-height: 88px; padding: 11px; border: 1px dashed #9ca8a8; background: #f8f6f0; }
+    .group-box strong { display: block; color: var(--teal); font-size: .76rem; letter-spacing: .06em; text-transform: uppercase; }
+    .group-box span { display: block; margin-top: 8px; color: var(--ink-soft); font: 600 .75rem/1.4 ui-monospace, SFMono-Regular, Consolas, monospace; }
+    .toy-split-result { min-height: 42px; margin: 0 0 13px; padding: 9px 11px; border-left: 2px solid var(--coral); color: var(--ink-soft); font-size: .8rem; }
+    .boundary-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px 18px; margin: 0; padding: 0; list-style: none; }
+    .boundary-list li { position: relative; padding: 11px 12px 11px 29px; border-bottom: 1px solid var(--line); color: var(--ink-soft); font-size: .87rem; }
+    .boundary-list li::before { position: absolute; top: 18px; left: 4px; width: 8px; height: 8px; border-radius: 50%; background: var(--coral); content: ""; }
+    .sources { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .source-card { padding: 16px 18px; }
+    .source-card h4 { margin: 0 0 7px; font: 700 1.08rem/1.25 var(--serif); }
+    .source-card p { margin: 0; color: var(--ink-soft); font-size: .82rem; }
+    .source-expander { border: 1px solid var(--line); background: rgba(255,253,248,.55); }
+    .source-expander > summary { padding: 13px 16px; color: var(--ink); font-size: .85rem; font-weight: 800; cursor: pointer; }
+    .source-expander > .sources { padding: 0 12px 12px; }
+    .gap-detail { margin-top: 10px; padding-top: 9px; border-top: 1px solid var(--line); }
+    .gap-detail summary { color: var(--teal); font-size: .77rem; font-weight: 800; cursor: pointer; }
+    .gap-detail p { margin: 7px 0 0; color: var(--ink-soft); font-size: .79rem; }
+    .access-label { display: inline-flex; align-items: center; margin-bottom: 8px; padding: 4px 7px; border-radius: 2px; background: var(--teal-pale); color: #1b5957; font-size: .65rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+    .access-label.project { background: var(--coral-pale); color: #773e34; }
+    .source-note { color: var(--muted); font-size: .76rem; }
+    .glossary-tools { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .search-field { width: min(100%, 400px); min-height: 42px; padding: 9px 12px; border: 1px solid var(--line); background: var(--paper-light); color: var(--ink); }
+    .glossary-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px 10px; }
+    .glossary-list details { border-bottom: 1px solid var(--line); background: rgba(255,253,248,.56); }
+    .glossary-list summary { padding: 10px 12px; color: var(--ink); font-size: .9rem; font-weight: 750; cursor: pointer; }
+    .glossary-list details p { margin: 0; padding: 0 12px 12px; color: var(--ink-soft); font-size: .84rem; }
+    .workflow-layout { display: grid; grid-template-columns: minmax(220px, 285px) minmax(0, 1fr); align-items: start; gap: 26px; }
+    .workflow-sidebar { position: sticky; top: 90px; }
+    .workflow-sidebar h3 { margin: 0 0 10px; font: 700 1.35rem/1.1 var(--serif); }
+    .workflow-sidebar .sidebar-note { margin: 0 0 14px; color: var(--muted); font-size: .78rem; }
+    .phase-nav { display: grid; gap: 3px; }
+    .phase-button { display: grid; grid-template-columns: 31px minmax(0,1fr); align-items: center; gap: 7px; width: 100%; padding: 9px 10px; border: 0; border-left: 2px solid transparent; background: transparent; text-align: left; cursor: pointer; }
+    .phase-button:hover { background: rgba(255,255,255,.55); }
+    .phase-button[aria-current="step"] { border-left-color: var(--coral); background: var(--paper-light); }
+    .phase-button .phase-no { color: var(--muted); font: 700 .77rem var(--serif); }
+    .phase-button .phase-name { color: var(--ink-soft); font-size: .81rem; font-weight: 700; line-height: 1.25; }
+    .phase-button[aria-current="step"] .phase-name { color: var(--ink); }
+    .workflow-progress { margin-top: 15px; padding: 13px; border: 1px solid var(--line); background: var(--paper-light); }
+    .progress-line { display: flex; justify-content: space-between; gap: 10px; color: var(--ink-soft); font-size: .75rem; }
+    .progress-track { height: 4px; margin: 8px 0 10px; background: var(--paper-deep); }
+    .progress-fill { width: 0; height: 100%; background: var(--teal); transition: width .2s ease; }
+    .progress-note { min-height: 1.3em; margin: 0 0 8px; color: var(--muted); font-size: .7rem; }
+    .workflow-content { min-width: 0; }
+    .phase-panel { padding: clamp(20px, 4vw, 40px); border: 1px solid var(--line); background: var(--paper-light); box-shadow: var(--shadow); }
+    .phase-panel .phase-titleline { display: flex; align-items: flex-start; gap: 15px; }
+    .phase-panel .large-number { display: grid; place-items: center; width: 50px; height: 50px; flex: 0 0 auto; border: 1px solid var(--coral); border-radius: 50%; color: var(--coral); font: 700 1.1rem var(--serif); }
+    .phase-panel h3 { margin: 1px 0 6px; font: 700 clamp(1.7rem, 4vw, 2.6rem)/1.03 var(--serif); letter-spacing: -.035em; }
+    .phase-panel .plain { margin: 0; color: var(--teal); font-size: .96rem; font-weight: 700; }
+    .phase-copy { max-width: 740px; margin: 25px 0 21px; color: var(--ink-soft); font-size: 1rem; }
+    .phase-block { margin-top: 20px; }
+    .phase-block h4 { margin: 0 0 8px; color: var(--muted); font-size: .7rem; letter-spacing: .11em; text-transform: uppercase; }
+    .phase-block p { margin: 0; color: var(--ink-soft); }
+    .phase-io { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; margin-top: 17px; }
+    .io-card { padding: 13px; border: 1px solid var(--line); background: #fbf9f3; }
+    .io-card strong { display: block; margin-bottom: 4px; color: var(--teal); font-size: .68rem; letter-spacing: .09em; text-transform: uppercase; }
+    .io-card p { margin: 0; color: var(--ink-soft); font-size: .85rem; }
+    .finding-callout { margin-top: 19px; padding: 15px 17px; border-left: 3px solid var(--coral); background: var(--coral-pale); color: #52342f; }
+    .finding-callout strong { display: block; margin-bottom: 4px; font-size: .71rem; letter-spacing: .1em; text-transform: uppercase; }
+    .workflow-more { margin-top: 18px; }
+    .workflow-more summary { color: var(--teal); font-size: .88rem; font-weight: 700; cursor: pointer; }
+    .phase-details { margin: 17px 0 0; padding-left: 20px; color: var(--ink-soft); }
+    .phase-details li { padding: 3px 0; }
+    .spoken-box { margin-top: 24px; padding: 16px 18px; border: 1px solid var(--line); background: #f2f5f1; }
+    .spoken-box .micro-label { color: var(--teal); }
+    .spoken-box p { margin: 7px 0 0; color: var(--ink); font: 1.05rem/1.45 var(--serif); }
+    .review-phase-control { display: flex; align-items: center; gap: 9px; margin-top: 20px; padding: 11px 12px; background: var(--paper); color: var(--ink-soft); font-size: .82rem; }
+    .review-phase-control input { width: 17px; height: 17px; accent-color: var(--teal); }
+    .phase-controls { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 21px; }
+    .phase-controls .step-count { color: var(--muted); font-size: .78rem; font-weight: 750; }
+    .findings-switch { display: inline-flex; flex-wrap: wrap; gap: 5px; padding: 5px; border: 1px solid var(--line); background: var(--paper-light); }
+    .findings-switch button { min-height: 40px; padding: 8px 14px; border: 0; background: transparent; color: var(--ink-soft); font-size: .82rem; font-weight: 750; cursor: pointer; }
+    .findings-switch button[aria-pressed="true"] { background: var(--ink); color: white; }
+    .findings-context { display: flex; flex-wrap: wrap; align-items: center; gap: 9px 16px; margin: 17px 0 22px; color: var(--muted); font-size: .8rem; }
+    .cohort-badge { display: inline-flex; align-items: center; padding: 5px 8px; background: var(--coral-pale); color: #773e34; font-size: .68rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+    .cohort-badge.official { background: var(--teal-pale); color: #1b5957; }
+    .metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+    .metric-card { min-height: 139px; padding: 16px; border: 1px solid var(--line); background: var(--paper-light); }
+    .metric-card .metric-name { display: block; color: var(--muted); font-size: .72rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
+    .metric-card .metric-value { display: block; margin: 8px 0 4px; font: 700 clamp(1.5rem, 3vw, 2.1rem)/1 var(--serif); font-variant-numeric: tabular-nums; }
+    .metric-card .metric-note { display: block; color: var(--ink-soft); font-size: .75rem; }
+    .result-layout { display: grid; grid-template-columns: minmax(0, 1.04fr) minmax(290px, .96fr); gap: 14px; margin-top: 16px; }
+    .result-card { min-width: 0; padding: 20px; }
+    .result-card h3 { margin: 0 0 5px; font: 700 1.45rem/1.15 var(--serif); }
+    .result-card .card-lede { margin: 0 0 15px; color: var(--muted); font-size: .8rem; }
+    .split-parts { display: grid; gap: 9px; }
+    .split-part { display: grid; grid-template-columns: minmax(94px, .65fr) minmax(0, 1.35fr); align-items: center; gap: 10px; }
+    .split-part .part-name { color: var(--ink-soft); font-size: .79rem; font-weight: 700; }
+    .split-bar { position: relative; height: 30px; overflow: hidden; background: #ece7dd; }
+    .split-bar .bar-fill { display: flex; align-items: center; min-width: 0; height: 100%; padding: 0 8px; background: var(--teal); color: white; white-space: nowrap; font-size: .7rem; font-weight: 800; }
+    .split-part:nth-child(2) .bar-fill { background: #1f6261; }
+    .split-part:nth-child(3) .bar-fill { background: var(--coral); }
+    .split-meta { grid-column: 2; margin-top: -8px; color: var(--muted); font-size: .7rem; }
+    .support-summary { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 7px; margin-top: 15px; }
+    .support-stat { padding: 9px; background: #f4f1e9; }
+    .support-stat strong { display: block; font: 700 1.1rem var(--serif); font-variant-numeric: tabular-nums; }
+    .support-stat span { display: block; color: var(--muted); font-size: .68rem; }
+    .summary-list { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 0 15px; margin: 0; }
+    .summary-list div { padding: 10px 0; border-bottom: 1px solid var(--line); }
+    .summary-list dt { color: var(--muted); font-size: .7rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+    .summary-list dd { margin: 3px 0 0; color: var(--ink); font-size: .96rem; font-weight: 750; font-variant-numeric: tabular-nums; }
+    .table-expander { margin-top: 15px; border: 1px solid var(--line); background: var(--paper-light); }
+    .table-expander summary { padding: 14px 17px; color: var(--ink); font-size: .88rem; font-weight: 800; cursor: pointer; }
+    .table-wrap { max-width: 100%; overflow-x: auto; border-top: 1px solid var(--line); }
+    table { width: 100%; border-collapse: collapse; font-size: .78rem; }
+    th, td { padding: 10px 11px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { background: #f0ece3; color: var(--ink); font-size: .67rem; letter-spacing: .07em; text-transform: uppercase; white-space: nowrap; }
+    td { color: var(--ink-soft); }
+    td strong { color: var(--ink); }
+    td.numeric, th.numeric { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .table-note { margin: 0; padding: 10px 13px; color: var(--muted); font-size: .73rem; }
+    .model-name { min-width: 48px; color: var(--ink) !important; font-weight: 850; }
+    .selected-mark { display: inline-block; padding: 2px 6px; background: var(--teal-pale); color: #1b5957; font-size: .66rem; font-weight: 800; }
+    .official-heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 12px; margin: 25px 0 13px; }
+    .official-heading h3 { margin: 0; font: 700 1.62rem/1.1 var(--serif); }
+    .official-heading p { margin: 0; color: var(--muted); font-size: .79rem; }
+    .arm-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
+    .arm-card { padding: 20px; border: 1px solid var(--line); background: var(--paper-light); }
+    .arm-card h4 { margin: 8px 0 4px; font: 700 1.35rem/1.14 var(--serif); }
+    .arm-card .arm-description { min-height: 2.7em; margin: 0 0 13px; color: var(--muted); font-size: .79rem; }
+    .arm-scoreline { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 7px; }
+    .arm-scoreline span:first-child { color: var(--ink-soft); font-size: .73rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+    .arm-scoreline strong { font: 700 1.45rem var(--serif); font-variant-numeric: tabular-nums; }
+    .arm-track { height: 14px; overflow: hidden; background: #ece7dd; }
+    .arm-fill { height: 100%; background: var(--coral); }
+    .arm-card:nth-child(2) .arm-fill { background: var(--teal); }
+    .arm-metrics { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 0 11px; margin: 15px 0 0; }
+    .arm-metrics div { padding: 8px 0; border-top: 1px solid var(--line); }
+    .arm-metrics dt { color: var(--muted); font-size: .66rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+    .arm-metrics dd { margin: 3px 0 0; color: var(--ink); font-size: .84rem; font-weight: 750; font-variant-numeric: tabular-nums; }
+    .official-topline { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 9px; margin: 0 0 14px; }
+    .official-mini { padding: 13px; border: 1px solid var(--line); background: #f0f6f2; }
+    .official-mini strong { display: block; font: 700 1.35rem/1.1 var(--serif); font-variant-numeric: tabular-nums; }
+    .official-mini span { display: block; margin-top: 5px; color: var(--muted); font-size: .7rem; }
+    .gain-panel { display: grid; grid-template-columns: minmax(0,.9fr) minmax(0,1.1fr); gap: 14px; margin-top: 13px; }
+    .gain-card, .rare-card, .limits-card { padding: 19px; }
+    .gain-card h4, .rare-card h4, .limits-card h4 { margin: 0 0 10px; font: 700 1.25rem/1.15 var(--serif); }
+    .gain-big { color: var(--teal); font: 700 2rem/1 var(--serif); font-variant-numeric: tabular-nums; }
+    .gain-card p { margin: 7px 0; color: var(--ink-soft); font-size: .8rem; }
+    .gain-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
+    .gain-chip { padding: 5px 8px; border: 1px solid var(--line); background: #fbf9f3; color: var(--ink-soft); font-size: .72rem; font-variant-numeric: tabular-nums; }
+    .error-pair { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 7px; margin-top: 11px; }
+    .error-pair div { padding: 9px; background: var(--paper); }
+    .error-pair strong { display: block; font: 700 1.15rem var(--serif); }
+    .error-pair span { display: block; color: var(--muted); font-size: .69rem; }
+    .rare-table td, .rare-table th { padding: 8px; }
+    .limitation-note { margin: 14px 0 0; padding: 13px 15px; border-left: 3px solid var(--gold); background: #f3eddf; color: #594a2b; font-size: .82rem; }
+    .limits-card ul { margin: 0; padding-left: 19px; color: var(--ink-soft); font-size: .82rem; }
+    .limits-card li { padding: 3px 0; }
+    .practice-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+    .practice-card { padding: 17px 19px; border: 1px solid var(--line); background: var(--paper-light); }
+    .practice-card .practice-no { color: var(--coral); font: 700 .77rem var(--serif); }
+    .practice-card h3 { margin: 5px 0 11px; font: 700 1.15rem/1.25 var(--serif); }
+    .practice-card details { border-top: 1px solid var(--line); }
+    .practice-card summary { padding: 10px 0 2px; color: var(--teal); font-size: .78rem; font-weight: 800; cursor: pointer; }
+    .practice-answer { padding: 7px 0 0; color: var(--ink-soft); font-size: .83rem; }
+    .practice-answer strong { color: var(--ink); }
+    .practice-answer blockquote { margin: 8px 0 0; padding: 8px 11px; border-left: 2px solid var(--coral); background: #f8f3ed; color: var(--ink); font-family: var(--serif); }
+    .quiz-shell { padding: clamp(18px, 3vw, 30px); }
+    .quiz-shell h3 { margin: 0 0 6px; font: 700 1.6rem/1.1 var(--serif); }
+    .quiz-shell > p { margin: 0 0 20px; color: var(--muted); font-size: .84rem; }
+    .quiz-question { margin: 0 0 13px; padding: 15px 16px 14px; border: 1px solid var(--line); }
+    .quiz-question legend { max-width: 100%; padding: 0 8px 0 0; color: var(--ink); font: 700 1rem/1.3 var(--serif); }
+    .quiz-options { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 6px 12px; margin-top: 8px; }
+    .quiz-option { display: flex; align-items: flex-start; gap: 8px; min-height: 37px; padding: 7px 8px; border: 1px solid transparent; color: var(--ink-soft); font-size: .8rem; cursor: pointer; }
+    .quiz-option:hover { border-color: var(--line); background: #fbf9f3; }
+    .quiz-option input { margin: 3px 0 0; accent-color: var(--teal); flex: 0 0 auto; }
+    .quiz-feedback { margin-top: 10px; padding: 10px 12px; border-left: 2px solid var(--teal); background: var(--teal-pale); color: #174b49; font-size: .78rem; }
+    .quiz-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; margin-top: 17px; }
+    .quiz-score { min-height: 1.7em; margin: 0; color: var(--ink); font-size: .9rem; font-weight: 800; }
+    .quiz-completion { margin-top: 12px; padding: 13px 15px; border: 1px solid var(--teal); background: var(--teal-pale); color: #174b49; font-size: .85rem; }
+    footer { display: flex; justify-content: space-between; gap: 15px; padding: 18px 0 30px; border-top: 1px solid var(--line); color: var(--muted); font-size: .73rem; }
+    .sr-only { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0,0,0,0) !important; white-space: nowrap !important; border: 0 !important; }
+    [hidden] { display: none !important; }
+
+    @media (max-width: 900px) {
+      .page { width: min(100% - 36px, 760px); }
+      .masthead { grid-template-columns: auto minmax(0,1fr); }
+      .header-actions { grid-column: 2; justify-content: flex-start; }
+      .topnav { margin-left: -18px; margin-right: -18px; padding-right: 18px; padding-left: 18px; }
+      .story-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .stage-flow { grid-template-columns: repeat(3,minmax(0,1fr)); }
+      .metric-grid, .official-topline { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .result-layout { grid-template-columns: 1fr; }
+      .workflow-layout { grid-template-columns: 1fr; }
+      .workflow-sidebar { position: static; }
+      .phase-nav { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .workflow-progress { max-width: 380px; }
+    }
+    @media (max-width: 600px) {
+      .page { width: calc(100% - 30px); }
+      .masthead { gap: 13px; padding: 19px 0 15px; }
+      .brand-mark { width: 46px; height: 46px; font-size: .9rem; }
+      .masthead .subline { font-size: .78rem; }
+      .header-actions { gap: 7px; }
+      .button { min-height: 39px; padding: 7px 10px; font-size: .78rem; }
+      .topnav { margin-left: -15px; margin-right: -15px; padding: 7px 8px; }
+      .tablist { gap: 2px; }
+      .tab { min-height: 42px; padding: 8px 4px; font-size: .75rem; }
+      .tab::after { right: 8px; left: 8px; }
+      main { padding-top: 24px; }
+      .page-intro { grid-template-columns: 1fr; gap: 17px; margin-bottom: 27px; }
+      .page-intro h2, .project-title { font-size: clamp(2.15rem, 12vw, 3.3rem); }
+      .page-intro .lede { font-size: .96rem; }
+      .section-head { display: block; margin-top: 35px; }
+      .section-head p { margin-top: 8px; }
+      .story-grid, .example-grid, .sources, .glossary-list, .practice-grid, .arm-grid, .gain-panel { grid-template-columns: 1fr; }
+      .story-card { min-height: auto; }
+      .facts-strip { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .fact-cell { min-height: 88px; padding: 12px; }
+      .stage-flow { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .stage-button { min-height: 123px; padding: 12px; }
+      .stage-detail { grid-template-columns: 1fr; gap: 12px; padding: 17px; }
+      .stage-detail .stage-explanation { padding: 13px 0 0; border-top: 1px solid var(--line); border-left: 0; }
+      .toy-flow { grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); gap: 6px; }
+      .toy-chip { padding: 6px; font-size: .68rem; }
+      .toy-output { padding: 9px; font-size: .71rem; }
+      .boundary-list { grid-template-columns: 1fr; }
+      .phase-nav { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .phase-button { grid-template-columns: 25px minmax(0,1fr); padding: 8px 6px; }
+      .phase-button .phase-name { font-size: .74rem; }
+      .phase-panel { padding: 18px 15px; }
+      .phase-panel .large-number { width: 41px; height: 41px; }
+      .phase-panel h3 { font-size: 1.8rem; }
+      .phase-copy { margin-top: 20px; font-size: .93rem; }
+      .phase-io { grid-template-columns: 1fr; }
+      .phase-controls { align-items: stretch; }
+      .phase-controls .button { padding: 7px 8px; }
+      .metric-grid, .official-topline { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 7px; }
+      .metric-card { min-height: 125px; padding: 12px; }
+      .metric-card .metric-value { font-size: 1.55rem; }
+      .result-card { padding: 15px; }
+      .support-summary { grid-template-columns: repeat(3,minmax(0,1fr)); }
+      .support-stat { padding: 7px; }
+      .summary-list { grid-template-columns: 1fr; }
+      .arm-card { padding: 16px; }
+      .arm-metrics { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .official-mini { padding: 11px; }
+      .official-mini strong { font-size: 1.15rem; }
+      .quiz-shell { padding: 16px 12px; }
+      .quiz-question { padding: 13px 11px; }
+      .quiz-options { grid-template-columns: 1fr; gap: 1px; }
+      footer { display: block; }
+      footer span { display: block; margin-top: 5px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+    @media print {
+      :root { --paper: #fff; --paper-light: #fff; --paper-deep: #eee; }
+      body { min-width: 0; background: white; color: #111; font-size: 10pt; }
+      .page { width: 100%; max-width: none; }
+      .masthead { padding: 0 0 12px; }
+      .brand-mark { width: 42px; height: 42px; }
+      .topnav, .no-print, footer { display: none !important; }
+      main { padding: 10px 0; }
+      #panels [hidden], #panels details:not([open]) > :not(summary) { display: block !important; }
+      #panels .tab-panel { margin: 0; padding: 10px 0 24px; border-top: 2px solid #777; animation: none; break-before: page; }
+      #panels .tab-panel:first-child { break-before: auto; }
+      .page-intro, .section-head { break-after: avoid; }
+      .paper-card, .phase-panel, .metric-card, .arm-card, .practice-card { box-shadow: none; break-inside: avoid; }
+      .workflow-layout { display: block; }
+      .workflow-sidebar { display: none; }
+      .phase-panel { margin: 10px 0; padding: 17px; break-inside: avoid; }
+      .phase-panel[hidden], .stage-detail[hidden], .quiz-feedback[hidden], .quiz-completion[hidden] { display: block !important; }
+      .stage-flow { grid-template-columns: repeat(5,minmax(0,1fr)); }
+      .stage-button { min-height: 0; padding: 8px; }
+      .stage-detail { display: grid !important; margin-top: 8px; break-inside: avoid; }
+      .stage-details { display: grid; gap: 6px; }
+      .example-grid, .arm-grid, .metric-grid, .story-grid { break-inside: avoid; }
+      .table-wrap { overflow: visible; }
+      table { font-size: 7.5pt; min-width: 0 !important; width: 100%; }
+      #models-table-wrap table { table-layout: fixed; }
+      #models-table-wrap th, #models-table-wrap td { font-size: 6.5pt; white-space: normal; overflow-wrap: anywhere; }
+      th, td { padding: 5px; }
+      .practice-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .practice-card details > :not(summary) { display: block !important; }
+      .quiz-key, .quiz-feedback { display: block !important; }
+      #panels #quiz-completion, #panels #quiz-score { display: none !important; }
+      a { color: #111; text-decoration: none; }
+      a[href^="http"]::after { content: " (" attr(href) ")"; font-size: .8em; overflow-wrap: anywhere; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page" id="reviewer">
+    <header class="masthead">
+      <a class="brand-mark" href="#project" aria-label="CICIDS2017 reviewer home">C/17</a>
+      <div>
+        <p class="eyebrow">Research field notes · CICIDS2017</p>
+        <h1 id="site-title">Project reviewer</h1>
+        <p class="subline" id="site-subtitle">A guided review of the dataset, workflow, findings, and practice questions.</p>
+      </div>
+      <div class="header-actions no-print" aria-label="Reviewer actions">
+        <button class="button" type="button" id="print-button">Print all</button>
+        <button class="button primary" type="button" id="download-button">Download HTML</button>
+      </div>
+    </header>
+
+    <nav class="topnav no-print" aria-label="Reviewer sections">
+      <div class="tablist" role="tablist" aria-label="Main sections" aria-orientation="horizontal">
+        <button class="tab" role="tab" id="tab-project" aria-controls="panel-project" aria-selected="true" tabindex="0" data-tab="project">Project</button>
+        <button class="tab" role="tab" id="tab-workflow" aria-controls="panel-workflow" aria-selected="false" tabindex="-1" data-tab="workflow">Workflow</button>
+        <button class="tab" role="tab" id="tab-findings" aria-controls="panel-findings" aria-selected="false" tabindex="-1" data-tab="findings">Findings</button>
+        <button class="tab" role="tab" id="tab-practice" aria-controls="panel-practice" aria-selected="false" tabindex="-1" data-tab="practice">Practice</button>
+      </div>
+    </nav>
+
+    <main id="panels">
+      <section class="tab-panel" id="panel-project" role="tabpanel" aria-labelledby="tab-project" tabindex="0">
+        <div class="page-intro">
+          <div>
+            <p class="kicker">01 / Project</p>
+            <h2 class="project-title" id="project-headline">A closer look at network intrusion detection</h2>
+            <p class="lede" id="project-intro"></p>
+          </div>
+          <aside class="intro-note" aria-label="How to use this reviewer"><strong>How to use this reviewer</strong>Move through the project, follow each workflow phase, then inspect custom and official findings in their separate views.</aside>
+        </div>
+
+        <div class="section-head">
+          <div><span class="section-tag">The research question</span><h3>Purpose and open gaps</h3></div>
+          <p>These cards frame the project decisions that the evidence and workflow are meant to answer.</p>
+        </div>
+        <div class="story-grid" id="project-story"></div>
+
+        <div class="section-head">
+          <div><span class="section-tag">Data trail</span><h3>From packet capture to model split</h3></div>
+          <p>Choose a stage to see what its row represents and how the dataset changes along the way.</p>
+        </div>
+        <div class="facts-strip" id="dataset-facts" aria-label="Dataset scope"></div>
+        <aside class="paper-card feature-scope-note" id="feature-scope-note" aria-label="Model input counts"></aside>
+        <div class="stage-flow" id="stage-flow" aria-label="Clickable data stages"></div>
+        <div class="stage-details" id="stage-details" aria-live="polite"></div>
+
+        <div class="section-head">
+          <div><span class="section-tag">Small demonstrations</span><h3>Two ideas, with toy data</h3></div>
+          <p>These are miniature illustrations for learning. They are not records or measurements from the reviewed dataset.</p>
+        </div>
+        <div class="example-grid">
+          <article class="paper-card example-card">
+            <span class="toy-label">Illustrative example · toy packets</span>
+            <h4>Several packets can become one summary</h4>
+            <p>A flow or time window can summarize activity across packets instead of treating every packet as a separate model input.</p>
+            <div class="toy-flow" aria-label="Toy packets summarized into one window">
+              <div class="toy-stack" aria-label="Toy packet examples">
+                <span class="toy-chip">A · 0 ms · 128 bytes</span><span class="toy-chip">B · 40 ms · 256 bytes</span><span class="toy-chip">C · 95 ms · 80 bytes</span>
+              </div>
+              <span class="toy-arrow" aria-hidden="true">→</span>
+              <div class="toy-output" id="packet-output" aria-live="polite"><strong>Summary output</strong>Choose the button to reveal one toy window summary.</div>
+            </div>
+            <button class="button small no-print" id="packet-example-button" type="button" aria-controls="packet-output">Show toy summary</button>
+            <p class="source-note">Illustrative values only; timestamps and byte sizes are invented for this example.</p>
+          </article>
+          <article class="paper-card example-card">
+            <span class="toy-label">Illustrative example · toy groups</span>
+            <h4>Keep related groups on one side of a split</h4>
+            <p>If related windows share a conversation, grouping helps prevent pieces of that same conversation from crossing into both sides.</p>
+            <div class="group-toy" aria-label="Toy conversation groups">
+              <div class="group-box"><strong>Toy group Cedar</strong><span>window α · window β</span></div>
+              <div class="group-box"><strong>Toy group Birch</strong><span>window γ · window δ</span></div>
+            </div>
+            <p class="toy-split-result" id="group-split-result" aria-live="polite">Choose the button to see the groups assigned together.</p>
+            <button class="button small no-print" id="group-example-button" type="button" aria-controls="group-split-result">Show grouped split</button>
+          </article>
+        </div>
+
+        <div class="section-head">
+          <div><span class="section-tag">Scope and boundaries</span><h3>What this work can claim</h3></div>
+          <p>Read the limits beside the results so that every score stays tied to the data and evaluation that produced it.</p>
+        </div>
+        <ul class="boundary-list" id="project-boundaries"></ul>
+
+        <div class="section-head">
+          <div><span class="section-tag">Evidence links</span><h3>Sources and access</h3></div>
+          <p>Each link carries a short access label. Project-member links may require an account or workspace permission.</p>
+        </div>
+        <details class="source-expander" id="sources-expander">
+          <summary id="sources-summary">Show evidence links</summary>
+          <div class="sources" id="source-list"></div>
+        </details>
+        <p class="source-note" id="source-note"></p>
+
+        <div class="section-head">
+          <div><span class="section-tag">Quick reference</span><h3>Metric and workflow glossary</h3></div>
+          <p>Search for a term, or open an entry for a plain-language explanation.</p>
+        </div>
+        <div class="glossary-tools no-print">
+          <label class="sr-only" for="glossary-search">Search glossary</label>
+          <input class="search-field" type="search" id="glossary-search" placeholder="Search terms such as macro F1 or leakage">
+        </div>
+        <div class="glossary-list" id="glossary-list"></div>
+      </section>
+
+      <section class="tab-panel" id="panel-workflow" role="tabpanel" aria-labelledby="tab-workflow" tabindex="0" hidden>
+        <div class="page-intro">
+          <div><p class="kicker">02 / Workflow</p><h2>Eleven phases, one research trail</h2><p class="lede">Move through the steps in order. Each phase names its purpose, inputs, outputs, finding, and a short explanation you can say aloud.</p></div>
+          <aside class="intro-note" aria-label="Read the sequence"><strong>Read the sequence</strong>Use the phase list or the previous and next controls. Review marks are saved in this browser when storage is available.</aside>
+        </div>
+        <div class="workflow-layout">
+          <aside class="workflow-sidebar" aria-label="Workflow phase navigation">
+            <h3>Phase index</h3>
+            <p class="sidebar-note">Select a phase to open its detail.</p>
+            <nav class="phase-nav" id="phase-nav" aria-label="Workflow phases"></nav>
+            <div class="workflow-progress">
+              <div class="progress-line"><strong>Review progress</strong><span id="progress-count">0 of 11</span></div>
+              <div class="progress-track" role="progressbar" aria-label="Workflow phases reviewed" aria-valuemin="0" aria-valuemax="11" aria-valuenow="0"><div class="progress-fill" id="progress-fill"></div></div>
+              <p class="progress-note" id="progress-note" aria-live="polite">Progress is kept on this device when browser storage allows.</p>
+              <button class="button small no-print" type="button" id="clear-progress-button">Clear marks</button>
+            </div>
+          </aside>
+          <div class="workflow-content" id="workflow-content" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section class="tab-panel" id="panel-findings" role="tabpanel" aria-labelledby="tab-findings" tabindex="0" hidden>
+        <div class="page-intro">
+          <div><p class="kicker">03 / Findings</p><h2>Read each result in its own frame</h2><p class="lede">The custom T1 held-out test and the official feature comparison use different cohorts and evaluation setups. Select one view at a time.</p></div>
+          <aside class="intro-note" aria-label="Keep the scopes clear"><strong>Keep the scopes clear</strong>The custom final test and the official cross-validation comparison do not share a ranking chart.</aside>
+        </div>
+        <div class="findings-switch no-print" role="group" aria-label="Choose findings view">
+          <button type="button" data-finding-mode="custom" aria-pressed="true">Custom experiment</button>
+          <button type="button" data-finding-mode="official" aria-pressed="false">Official comparison</button>
+        </div>
+        <section id="custom-view" aria-labelledby="custom-view-title">
+          <div class="findings-context"><span class="cohort-badge">Custom experiment</span><span id="custom-context"></span></div>
+          <h3 class="sr-only" id="custom-view-title">Custom T1 experiment results</h3>
+          <div class="metric-grid" id="custom-metrics"></div>
+          <div class="result-layout">
+            <article class="paper-card result-card">
+              <h3>Grouped split</h3>
+              <p class="card-lede" id="split-description">Counts and shares follow the recorded split definition.</p>
+              <div class="split-parts" id="split-parts"></div>
+              <div class="support-summary" id="split-meta"></div>
+            </article>
+            <article class="paper-card result-card">
+              <h3>Frozen T1 test summary</h3>
+              <p class="card-lede">Metrics are shown as reported for the selected custom model.</p>
+              <dl class="summary-list" id="test-summary"></dl>
+            </article>
+          </div>
+          <details class="table-expander" id="models-expander">
+            <summary>Expand all nine model rows and settings</summary>
+            <p class="table-note">A–E, W1, T1, T2, and T3 are shown together for model-level context. Null CV values are reported as “Not run.”</p>
+            <div class="table-wrap" id="models-table-wrap" tabindex="0" role="region" aria-label="Custom model settings and scores; scroll horizontally if needed"></div>
+          </details>
+          <div class="section-head">
+            <div><span class="section-tag">Held-out evaluation</span><h3>Per-class test support and F1</h3></div>
+            <p>Support is the number of test examples in a class. A zero or absent test class has no defined F1 and is shown as N/A.</p>
+          </div>
+          <div class="paper-card table-wrap" id="per-class-table-wrap" tabindex="0" role="region" aria-label="T1 test scores by class; scroll horizontally if needed"></div>
+        </section>
+        <section id="official-view" aria-labelledby="official-view-title" hidden>
+          <div class="findings-context"><span class="cohort-badge official">Official comparison</span><span id="official-context"></span></div>
+          <h3 class="sr-only" id="official-view-title">Official feature comparison results</h3>
+          <div class="official-topline" id="official-topline"></div>
+          <div class="official-heading"><h3>Mean cross-validation macro F1</h3><p>Two separate feature arms; standard deviation is in percentage points.</p></div>
+          <div class="arm-grid" id="official-arms"></div>
+          <div class="gain-panel">
+            <article class="paper-card gain-card" id="gain-card"></article>
+            <article class="paper-card rare-card"><h4>Rare-class check</h4><div class="table-wrap rare-table" id="rare-classes-table" tabindex="0" role="region" aria-label="Rare class scores in the official comparison; scroll horizontally if needed"></div></article>
+          </div>
+          <article class="paper-card limits-card" style="margin-top:13px" id="official-limits"></article>
+          <p class="limitation-note">This is the reviewed official cohort’s cross-validation comparison. Interpret its mean CV result within that cohort; it does not rank against the custom T1 frozen final test.</p>
+        </section>
+      </section>
+
+      <section class="tab-panel" id="panel-practice" role="tabpanel" aria-labelledby="tab-practice" tabindex="0" hidden>
+        <div class="page-intro">
+          <div><p class="kicker">04 / Practice</p><h2>Build a clear explanation</h2><p class="lede">Use the prompts to rehearse the project in plain language. Open each card for an answer and a short version to say aloud.</p></div>
+          <aside class="intro-note" aria-label="Try before revealing"><strong>Try before revealing</strong>Answer each prompt in your own words, then compare your explanation with the notes.</aside>
+        </div>
+        <div class="practice-grid" id="practice-grid"></div>
+        <div class="section-head">
+          <div><span class="section-tag">Check your understanding</span><h3>Eight-question quiz</h3></div>
+          <p>Choose one answer for each question, submit for a score and explanations, or reset to try again.</p>
+        </div>
+        <form class="paper-card quiz-shell" id="quiz-form">
+          <h3>Quick knowledge check</h3>
+          <p>The answer key stays available in print and appears after you submit in the interactive reviewer.</p>
+          <div id="quiz-questions"></div>
+          <div class="quiz-actions no-print">
+            <button class="button primary" type="submit">Submit answers</button>
+            <button class="button" type="button" id="reset-quiz-button">Reset quiz</button>
+            <p class="quiz-score" id="quiz-score" aria-live="polite"></p>
+          </div>
+          <div class="quiz-completion" id="quiz-completion" hidden></div>
+        </form>
+      </section>
+    </main>
+    <footer><span>Prepared as an offline-friendly research reviewer.</span><span id="reviewed-date"></span></footer>
+  </div>
+
+  <script>
+window.REVIEWER_CONTENT = {"meta": {"title": "CICIDS2017 Project Reviewer", "subtitle": "A plain-language guide to the data, saved model, evidence, and limits", "reviewedDate": "2026-10-23"}, "project": {"headline": "Can a Random Forest recognize attack patterns in network traffic?", "intro": "This project turns CICIDS2017 packet captures into 60-second conversation summaries, then trains Random Forest models to label each summary as normal traffic or an attack type. It reviews the saved measurements and explains where the evidence is small or incomplete.", "goal": "We compare models using the same saved validation set and grouped cross-validation, choose one before scoring the reserved test, and explain its results and limits.", "pitch": "The frozen T1 model scored 85.77% supported-class Macro F1 and 99.51% accuracy on 499,109 reserved test rows. It was not refitted for that test. The high overall scores do not mean every attack is reliably found: SQL Injection had only two test rows, and Bot, Infiltration, and XSS still have important errors.", "gaps": [{"title": "High accuracy can hide weak uncommon-attack scores", "observed": "The first weighted model B reached 99.36% validation accuracy but only 74.13% supported-class Macro F1. BENIGN rows dominate the total, so the accuracy number alone hides weaker attack-class results.", "question": "How did we check whether the model also handled the less common attacks?", "action": "We used supported-class Macro F1 as the main model-selection measure and reported per-class scores with each class's support.", "learned": "Accuracy and Macro F1 answer different questions. Looking at class scores and support makes uncommon-class weaknesses easier to see."}, {"title": "Normal traffic was mistaken for attacks", "observed": "On the fixed T1 test set, 2,218 of 417,513 BENIGN rows were labeled as attacks, a 0.53% false-alarm rate. The largest destinations were PortScan (1,567 rows) and Bot (509 rows).", "question": "How often did normal traffic trigger an attack label, and which labels caused the alerts?", "action": "We analyzed the saved validation and test errors by actual and predicted class, then reported BENIGN false-alarm counts and rates.", "learned": "Most T1 test errors were normal rows flagged as attacks. Bot precision was 45.79%, even though Bot recall was 97.29%."}, {"title": "Related rows could make evaluation unfair", "observed": "Many windows can come from the same conversation, and identical baseline patterns can appear in linked rows. If related rows land on both fitting and held-out sides, the score can look better than a genuinely separate check.", "question": "How did we keep related windows together during model checks?", "action": "We reused the saved grouped split and its three grouped cross-validation folds, keeping whole conversations and linked identical baseline patterns together.", "learned": "Grouping reduces overlap between fitting and held-out rows. Large groups also mean the saved partitions are close to, but not exactly, 60/20/20."}, {"title": "More traffic measurements might help difficult classes", "observed": "Our custom experiments used 15 baseline predictors and also tried four added values and fitted feature selection. A later, separate study tested a fuller set of official flow measurements.", "question": "Did adding or selecting traffic measurements improve results?", "action": "We tested four added predictors in model C, feature selectors in D and E, then ran a separate paired comparison of 15 official flow analogs and 77 official numeric inputs on the same saved folds.", "learned": "The 77-input official arm averaged 81.98% Macro F1 versus 80.42% for 15 analogs, a 1.56-point difference. These are official flow rows, not T1's custom windows, so the result does not show that the 77 inputs beat T1."}, {"title": "Rare classes had too few independent examples", "observed": "Heartbleed has 20 custom windows from one conversation, and the aligned official study retained nine Heartbleed flows from one group. Neither source can place independent Heartbleed examples in both fitting and held-out rows.", "question": "Why keep Heartbleed in the study when its held-out score is N/A?", "action": "We kept the Heartbleed examples on fitting sides, kept their groups intact, and reported zero held-out support with N/A scores.", "learned": "N/A means there were no independent held-out examples to score; it is not a failed score of zero. The project does not claim reliable Heartbleed detection."}], "boundaries": ["These results describe CICIDS2017 data, not live network traffic or a deployed alerting system.", "The custom pipeline makes one row per 60-second conversation window. The official comparison uses different, flow-level records.", "Three saved folds show observed variation; they do not establish statistical certainty or a guaranteed future ranking.", "The final test was scored after the T1 choice was frozen. It was not used for another model search or refit.", "The official-flow benchmark used a matched, filtered cohort. Its scores are not a direct comparison with custom T1.", "This reviewer contains aggregate results and schemas, not raw packet rows, connection records, or IP addresses."]}, "stages": [{"id": "pcap", "title": "Packet captures", "countLabel": "5 CICIDS2017 capture days", "rowMeaning": "A PCAP is a binary recording of packets, not a table row.", "explanation": "The project starts from the CICIDS2017 packet captures. Packets are decoded into tables so their fields and capture times can be processed.", "detail": "The dataset covers five weekdays. A PCAP records packets; it is not yet a model row."}, {"id": "decoded44", "title": "Decoded packet rows", "countLabel": "44 columns · recorded historical schema", "rowMeaning": "One row represents one decoded packet or frame.", "explanation": "The historical decoder report records 44 columns here, with packet fields and capture/time information.", "detail": "The 44-column count is the recorded historical schema. The 23 October review checked all five actual annotated files at 47 columns and all five prepared files at 19."}, {"id": "annotated47", "title": "Packet rows with labels", "countLabel": "47 columns", "rowMeaning": "One row still represents one decoded packet or frame.", "explanation": "Three label fields are added: label, label_status, and label_source. The 23 October review checked all five actual raw annotated CSV headers and found 47 columns in each.", "detail": "The move from 44 to 47 columns adds annotation fields. It does not create the model's 15 predictors by dropping packet columns."}, {"id": "prepared19", "title": "Prepared conversation windows", "countLabel": "2,506,919 rows · 19 columns", "rowMeaning": "One row summarizes a conversation during a 60-second window.", "explanation": "This is where packet rows are grouped and the initial feature extraction happens. Each row has 15 numeric predictors and four metadata fields: conversation_id, capture_file, label, and label_status.", "detail": "The 53,257 UNLABELED rows remain in the prepared files but are excluded from supervised fitting and scoring. Model C later adds four engineered ratios or indicators to make 19 model inputs. Frozen T1 uses the original 15 predictors."}, {"id": "split23", "title": "Saved model partitions", "countLabel": "2,453,662 labeled rows · 23 columns", "rowMeaning": "One row is still a prepared conversation window, now with saved group and split information.", "explanation": "Four fields are added to the 19 prepared columns: split_group, feature_hash, partition, and cv_fold. Related conversations and linked identical baseline patterns stay together.", "detail": "The fixed split has 1,472,712 training rows, 481,841 validation rows, and 499,109 test rows. It also stores three grouped training folds. Heartbleed has 20 custom windows from one conversation, all on fitting sides; its held-out score is N/A."}], "workflow": [{"id": "problem", "title": "Define the problem", "plain": "Predict the traffic label for each prepared conversation window.", "what": "The labels include normal traffic and 14 attack types. The project compares Random Forest settings and uses supported-class Macro F1 as its main selection measure.", "why": "Accuracy alone can look strong when normal traffic is most of the data. A class-balanced measure helps show whether smaller attack classes are found.", "input": "A labeled network-traffic classification task.", "output": "A fixed question: how well can a model label these data rows, especially across the supported classes?", "finding": "The prepared set has 15 labels in training; 14 have independent held-out support. Heartbleed does not.", "spoken": "We classify each 60-second traffic summary, and we report class-level scores because normal traffic dominates the row count.", "details": ["This is a study of a named benchmark dataset, not a claim that the model is ready to monitor a live network.", "A class with no held-out examples cannot receive a measured held-out score."]}, {"id": "gathering", "title": "Gather the data", "plain": "Start from CICIDS2017 captures, labels, and saved project files.", "what": "CICIDS2017 provides five weekdays of packet captures and labeled traffic. The project also keeps prepared CSVs and a separate archive of official flow-level data for a later comparison.", "why": "The source and label records explain what a row represents and where the labels came from.", "input": "CICIDS2017 packet captures and label references; later, official flow CSVs for a separate study.", "output": "Decoded packet tables and project records that can be checked before modeling.", "finding": "CICIDS2017 provides packet captures and a separate set of official labeled flow files, which the project studies as a different data source.", "spoken": "We use the named CICIDS2017 benchmark and keep the custom packet workflow separate from the official flow files.", "details": ["The 23 October review verified all five actual 47-column annotated headers.", "The custom packet workflow and official flow archive are kept as separate sources with different row units."]}, {"id": "understanding", "title": "Understand the rows", "plain": "Check which records are packets, windows, or flows before counting them.", "what": "A decoded packet row, a 60-second conversation-window row, and an official flow row are different units. The review also checks class counts and labels.", "why": "Counts and scores are easy to misread if one row is assumed to mean the same thing at every stage.", "input": "The decoded and annotated CSVs, prepared windows, saved split, and separate official-flow archive.", "output": "A checked description of the units, columns, label support, and limits.", "finding": "The prepared data has 2,506,919 rows: 2,453,662 with sourced labels and 53,257 marked UNLABELED.", "spoken": "Before looking at model scores, we check what each row means and how many examples each class has.", "details": ["The five raw annotated CSV headers each have 47 columns; the five prepared CSV headers each have 19.", "A score needs actual examples in the evaluated rows. Heartbleed has none in validation or test."]}, {"id": "preparation", "title": "Prepare labels and saved fields", "plain": "Keep sourced labels for supervised work and retain unlabeled rows outside it.", "what": "The packet table gains label, label_status, and label_source. Prepared rows retain identity and label metadata; the saved partition adds group, feature hash, partition, and fold fields.", "why": "Clear labels and group keys let the team fit only known examples and keep related rows together during evaluation.", "input": "The 47-column annotated packet rows and saved preparation rules.", "output": "Prepared 19-column windows plus saved 23-column partition rows.", "finding": "The 53,257 UNLABELED rows stay in the prepared data but are outside supervised fitting and scoring.", "spoken": "We do not treat an unknown label as a training target, and we keep identifiers for grouping and review rather than as predictors.", "details": ["The 19 prepared columns consist of 15 numeric predictors and four identity/label fields.", "The saved partition adds split_group, feature_hash, partition, and cv_fold."]}, {"id": "extraction", "title": "Extract window features", "plain": "Summarize packets into 15 numbers for each 60-second conversation window.", "what": "The initial feature extraction groups packet rows by conversation and time window, then calculates counts and statistics for protocol, duration, bytes, packet sizes, direction, and TCP flags.", "why": "A fixed-size summary gives the model numerical descriptions of each window instead of one model row per packet.", "input": "Packet rows, timestamps, direction and protocol fields, and the conversation grouping rules.", "output": "One prepared window row with 15 baseline predictors plus four metadata fields.", "finding": "The 15 predictors already exist before model training. Model C later adds four derived predictors; T1 stays with the original 15.", "spoken": "Feature extraction is the packet-to-window step. T1 uses those 15 original summaries; C is the experiment that adds four more inputs.", "details": ["The 47 packet columns are not reduced to 15 by dropping columns or using PCA.", "C's four added inputs are forward-to-backward packet ratio, forward-to-backward byte ratio, forward packet share, and a no-backward-packets indicator."]}, {"id": "splitting", "title": "Split by related groups", "plain": "Use the saved train, validation, test, and three-fold assignments.", "what": "The split keeps whole conversations together and links identical baseline predictor patterns through split_group. The three grouped CV folds are saved with the data.", "why": "If closely related records appear in both fitting and held-out rows, the model may be tested on examples that are too similar to what it saw.", "input": "The 2,453,662 sourced-label rows and their conversation and feature-group keys.", "output": "1,472,712 training rows, 481,841 validation rows, and 499,109 test rows in split_68ab64fbdd2b, plus three training folds.", "finding": "Heartbleed's 20 custom windows come from one conversation and stay on fitting sides; its validation and test scores are N/A.", "spoken": "We reuse the saved grouped split so related windows do not cross between fitting and held-out data.", "details": ["The row shares are about 60%, 20%, and 20%; group sizes mean the exact shares are not perfectly even.", "A class present only on fitting sides cannot be evaluated independently."]}, {"id": "baseline-training", "title": "Train the first model set", "plain": "Compare five saved Random Forest designs named A through E.", "what": "A and B use 15 baseline predictors; B adds balanced class weights. C uses 19 predictors after adding four ratios or indicators. D and E use fitted feature selectors.", "why": "This first set checks whether class weighting, added summaries, or selecting fewer inputs changes supported-class scores.", "input": "Training rows, 15 baseline predictors, and the saved A–E model settings.", "output": "Validation and three-fold grouped-CV results for the historical model set.", "finding": "C had the best mean CV Macro F1 among A–E at 66.10%; later eligible trials placed T1 ahead of C.", "spoken": "The first comparison gave us a useful reference, but the final selection included later trials too.", "details": ["The original A–E forests used 80 trees, depth 12, leaf size 2, seed 42, and two CPU workers.", "Selectors and class weights are fitted using fitting rows, not held-out test values."]}, {"id": "feature-settings", "title": "Try settings and added inputs", "plain": "Test four new weight or tree-setting choices, then check the shortlisted trials on all three folds.", "what": "W1 changes the class-weight rule, T1 uses a deeper forest, T2 uses smaller leaves, and T3 combines a deeper forest with smaller leaves. Each uses the baseline 15 predictors.", "why": "These trials ask whether different treatment of rare classes or tree detail helps on the saved data.", "input": "Training and validation rows, the same baseline predictor definition, and fixed settings for each trial.", "output": "Four validation results; T1 and T3 also receive all three saved grouped-CV fits.", "finding": "T1 averaged 71.43% Macro F1 across the three folds with an 8.49-point sample SD. W1 and T2 CV was Not run because they were not shortlisted.", "spoken": "We did not assume that a deeper tree or a weighting change would help; we checked the saved validation and fold results.", "details": ["T1 uses 80 trees, maximum depth 20, minimum leaf size 2, balanced weights, seed 42, and two CPU workers.", "T1's mean CV Macro F1 led T3 by 0.1021 percentage points using full-precision values.", "For every CV fit performed, balanced weights were recalculated from that fold's fitting labels only. W1 used square-root balanced weights for validation; its CV was Not run."]}, {"id": "selection-test", "title": "Freeze T1, then score the test", "plain": "Select by saved grouped-CV results before scoring the reserved test with the saved model.", "what": "T1 ranked first among A–E, T1, and T3 by full-precision mean grouped-CV Macro F1. The choice was frozen on 21 October before the final test was scored.", "why": "Keeping the test out of model choice gives a clearer final check on rows that did not guide the selected setting.", "input": "The saved model fitted on 1,472,712 training rows, the frozen choice, and the reserved 499,109-row test set.", "output": "85.77% supported-class Macro F1, 99.51% accuracy, and 2,218 benign false alarms among 417,513 benign rows.", "finding": "The test Macro F1 is above the 71.43% CV mean, but the model was not refitted. CV averages three fold fits on different held-out rows; the final score comes from the frozen training-only fit on the reserved test. Against validation, the test score is 8.03 points higher, and two SQL rows contribute 7.14 points to that difference.", "spoken": "The higher test score is a result on different rows, not an improvement caused by retraining. T1 was frozen before the test and scored without a refit.", "details": ["CV averages held-out scores from three fold fits. The final test scores the frozen training-only fit on a separate reserved partition, so the two estimates can differ.", "SQL Injection changed from F1 zero on two validation rows to F1 100% on two test rows. That small support has a large effect because Macro F1 gives each supported class equal weight.", "The test was used for reporting, not another parameter search, model choice, or refit."]}, {"id": "official-comparison", "title": "Compare official flow inputs separately", "plain": "Compare 15 flow-level analogs with 77 official numeric inputs on matched official-flow rows.", "what": "The exploratory study reused the three grouped folds and fixed T1 forest settings. It compared two input sets on the same filtered, aligned official flow cohort.", "why": "This asks whether the fuller official-flow representation helps within that study while holding rows, groups, and folds constant.", "input": "1,126,067 eligible official flows in 536,179 groups, including nine Heartbleed rows that always fit; 1,126,058 rows receive held-out predictions.", "output": "80.42% mean grouped-CV Macro F1 for 15 flow analogs and 81.98% for 77 official inputs, a paired mean difference of 1.56 points.", "finding": "The 77-input set scored higher on each of the three saved folds, but three folds do not establish statistical certainty. The flow analogs do not reproduce T1's custom 60-second window inputs.", "spoken": "The result supports the fuller official input set within this filtered paired comparison; it does not show that it beats custom T1.", "details": ["The official archive has 85 column positions; seven tracing or label fields and one identical duplicate leave 77 numeric inputs.", "The 15 analogs approximate baseline concepts at the official flow level. They are not T1's actual 15 custom window inputs.", "The nine official Heartbleed flow rows are different from the 20 custom Heartbleed window rows; both sets stay on fitting sides.", "In each fold, the official median imputer and class weights are fit on that fold's fitting rows only.", "Infiltration and SQL Injection both had zero F1 in this study; Heartbleed had no held-out support and is N/A."]}, {"id": "interpretation-reporting", "title": "Interpret and report the limits", "plain": "Pair overall metrics with per-class support, false alarms, and what the study cannot establish.", "what": "The report explains accuracy, Macro F1, precision, recall, false alarms, fold variation, rare-class support, data provenance, and the different official-flow study.", "why": "A single high score can hide weak detection on rare attacks, and different row units or cohorts cannot be treated as a direct ranking.", "input": "Reviewed aggregate tables, schema checks, saved model results, and source documentation.", "output": "A bounded conclusion: strong results on many larger classes, with remaining errors and limited evidence for rare classes.", "finding": "T1's Bot precision was 45.79%, Infiltration F1 was 47.62% on 13 rows, XSS F1 was 36.00% on 18, and Heartbleed was N/A.", "spoken": "We report what the saved measurements show and keep small support, fold variation, and source gaps beside the headline scores.", "details": ["Accuracy counts correct rows and can be driven by the large BENIGN class.", "A supported class the model completely misses has F1 zero; a class with no held-out examples has score N/A.", "The official benchmark uses a filtered cohort and a different row unit, so its scores do not rank directly against T1's custom test.", "The original Wednesday and Thursday conversion logs were not recovered. On 23 October, their connection metadata was reconstructed from saved raw CSVs and checked against prepared outputs; this is new evidence, not the original logs."]}], "glossary": [{"term": "Accuracy", "plain": "The share of all evaluated rows the model labels correctly.", "detail": "It can be high when the largest class is predicted well, even if some smaller attacks are missed."}, {"term": "Precision", "plain": "Among rows predicted as a class, the share that truly belongs to that class.", "detail": "Low Bot precision means many rows labeled Bot were not actually Bot."}, {"term": "Recall", "plain": "Among the actual rows in a class, the share the model finds.", "detail": "High Bot recall means most actual Bot rows were found; it does not say how many normal rows were also labeled Bot."}, {"term": "F1", "plain": "A score that combines precision and recall for one class.", "detail": "It is low when either precision or recall is low, and it is zero when a supported class has no correct predictions."}, {"term": "Macro F1", "plain": "The average of class F1 scores, giving each supported class equal weight.", "detail": "The project averages the 14 classes with held-out examples. A class with zero held-out support is excluded and reported as N/A."}, {"term": "False alarm", "plain": "A normal BENIGN row predicted as an attack.", "detail": "The false-alarm rate divides these rows by the actual BENIGN rows. T1 flagged 2,218 of 417,513 test BENIGN rows."}, {"term": "Fold", "plain": "One round of CV: part of the data is held out while the rest is used to fit the model.", "detail": "CV means cross-validation. This project uses three saved grouped folds of training data, and each fold keeps related rows together."}, {"term": "Variation / SD", "plain": "Standard deviation describes how far fold scores spread around their average.", "detail": "The project reports sample SD in percentage points. It describes the three observed folds; it is not a confidence interval."}, {"term": "Class weights", "plain": "Training settings that give more influence to examples from less common classes.", "detail": "Weights do not add examples or guarantee better rare-class detection. They are calculated from fitting rows."}, {"term": "Feature", "plain": "A measured value that describes traffic, such as packet count or byte total.", "detail": "The initial custom extraction makes 15 numeric features for each 60-second conversation window."}, {"term": "Predictor", "plain": "A feature supplied to a model as an input for making a prediction.", "detail": "T1 takes 15 baseline predictors. Model C adds four derived predictors and therefore uses 19."}, {"term": "Support", "plain": "The number of actual examples of a class in the evaluated rows.", "detail": "A score from two rows is much less informative about future performance than a score from many independent examples."}, {"term": "T1", "plain": "Trial 1: the name of the selected and frozen custom Random Forest model.", "detail": "T1 uses 80 trees, depth 20, minimum leaf size 2, balanced class weights, and the original 15 predictors. It was fitted on training rows only."}, {"term": "Conversation", "plain": "Packets linked as one two-way exchange for the project's summaries.", "detail": "The project uses conversation identity to make time-window rows and keep related rows together during splitting."}, {"term": "Window", "plain": "A 60-second time slice used to summarize a conversation.", "detail": "One prepared row represents one conversation during a window, rather than one packet."}, {"term": "Flow", "plain": "A connection summary row produced by the official CICFlowMeter data.", "detail": "An official flow row has a different boundary and meaning from one custom 60-second conversation window."}, {"term": "Leakage", "plain": "When information from held-out examples helps fit or choose a model.", "detail": "Keeping related groups together and fitting learned settings on fitting rows helps prevent leakage."}, {"term": "Hyperparameter", "plain": "A model setting chosen before fitting, such as tree depth or leaf size.", "detail": "T1's maximum depth is 20 and its minimum leaf size is 2."}, {"term": "Validation", "plain": "A held-out set used to compare or inspect model choices during development.", "detail": "Validation is separate from the final reserved test. The final test is for reporting after the choice is frozen."}, {"term": "Test", "plain": "The reserved held-out rows used for the final evaluation.", "detail": "T1 was frozen before the 499,109 test rows were scored; the result was not used for another search or refit."}, {"term": "N/A", "plain": "A score is not available because there are no examples of that class in the evaluated rows.", "detail": "Heartbleed has zero validation and test support, so its held-out precision, recall, and F1 are N/A."}, {"term": "Not run", "plain": "The planned calculation was not performed.", "detail": "W1 and T2 have validation results, but their three-fold CV was Not run because they were not shortlisted."}, {"term": "Zero", "plain": "A measured score of 0 when the class has evaluated examples but no correct hits.", "detail": "For example, official-flow Infiltration had 25 held-out flows and F1 zero. That is different from N/A, which has no held-out examples."}], "practice": [{"question": "What is this project trying to predict?", "answer": "It predicts the label of each 60-second conversation-window summary as BENIGN or one of 14 attack types.", "say": "We classify traffic summaries from CICIDS2017 and check performance by class, not just by total accuracy."}, {"question": "What does one prepared row represent?", "answer": "One row summarizes a conversation during a 60-second window; it is not one packet or one official flow.", "say": "Our model row is a window summary, which is why packet, prepared-window, and official-flow counts differ."}, {"question": "Why do the prepared file and T1 have different feature counts?", "answer": "The 19 prepared columns are 15 numeric predictors plus four metadata fields. T1 uses the 15 predictors; Model C adds four engineered inputs and uses 19 predictors.", "say": "The initial packet-to-window extraction already made the 15 features. C adds four more, but T1 stays at 15."}, {"question": "Why are UNLABELED rows not used for supervised training?", "answer": "They have no sourced target label for the model to learn or for the evaluation to check. The 53,257 rows remain in prepared data but are excluded from supervised fitting and scoring.", "say": "We keep the rows for the data record, but we do not pretend an unknown label is a known answer."}, {"question": "How does the split reduce the risk of testing on familiar examples?", "answer": "It keeps whole conversations and linked identical baseline patterns together, then reuses the saved train, validation, test, and three grouped folds.", "say": "Related windows stay on one side of the split so a near-copy is less likely to appear in both fitting and held-out rows."}, {"question": "Why report Macro F1 and accuracy together?", "answer": "Accuracy counts correct rows and can be dominated by common BENIGN traffic. Macro F1 averages the F1 of supported classes equally, so it makes rare-class misses more visible.", "say": "Accuracy tells us how many rows were right overall; Macro F1 gives each supported class a voice."}, {"question": "What does T1 mean, and how was it chosen?", "answer": "T1 means Trial 1, the name of one tested Random Forest setting. It ranked first among eligible models by full-precision mean Macro F1 across the three saved grouped cross-validation folds: 71.43%. Its lead over T3 was only 0.1021 percentage points.", "say": "We called it Trial 1. It had the highest saved-fold average, so we froze it before the test; three folds do not prove its small lead over T3 will persist."}, {"question": "Why is the test Macro F1 higher than the CV mean?", "answer": "They use different held-out rows and fitting conditions. The frozen training-only model was scored on the reserved test without refitting; two SQL test examples contribute strongly to the difference. A higher test result is not evidence of improvement from retraining.", "say": "The model did not learn between those scores. The test rows gave a different result, especially because two SQL examples changed the class average."}, {"question": "Does 99.51% test accuracy mean every attack is reliably detected?", "answer": "No. Test support is small for several attacks; for example, Infiltration has 13 rows, XSS has 18, and SQL Injection has two. Bot precision is 45.79%, and Heartbleed has no held-out support.", "say": "High accuracy is encouraging for many rows, but it does not prove reliable detection of every attack type."}, {"question": "What does T1's false-alarm rate mean?", "answer": "It is the number of actual BENIGN rows labeled as attacks divided by all actual BENIGN rows. T1 flagged 2,218 of 417,513 BENIGN test rows, or 0.53%.", "say": "A false alarm here means normal traffic was called an attack. We report its rate among normal rows."}, {"question": "Where did the 77 measurements come from, and what did the comparison show?", "answer": "They came from the official CICFlowMeter flow CSVs: 85 column positions minus seven tracing or label fields and one duplicate left 77 numeric inputs. On the same filtered rows and three folds, they averaged 81.98% Macro F1 versus 80.42% for 15 flow-level analogs, a 1.56-point difference. These are different rows and inputs from T1.", "say": "The 77 measurements are from the official flow files. They scored higher than 15 official flow analogs in that paired study, but this does not show that they beat custom T1."}, {"question": "Why keep Heartbleed in the study if its held-out score is N/A?", "answer": "Its 20 custom windows come from one conversation, so they stay together on fitting sides instead of being split to create a misleading test. The official study's nine Heartbleed flows also stay on fitting sides. We report the held-out score as N/A because there are no independent held-out examples.", "say": "We keep the examples for fitting, but we cannot score Heartbleed on unseen conversations here. N/A means no held-out examples, not a score of zero."}], "quiz": [{"question": "How many numeric predictors does the frozen T1 model use?", "options": ["4", "15", "19", "47"], "correct": 1, "explanation": "T1 uses the original 15 baseline predictors. The prepared file has 19 columns because four are metadata; Model C adds four predictors and uses 19."}, {"question": "How many prepared rows have sourced labels for supervised work?", "options": ["53,257", "499,109", "2,506,919", "2,453,662"], "correct": 3, "explanation": "There are 2,453,662 rows with sourced labels. The other 53,257 are UNLABELED and remain outside supervised fitting and scoring."}, {"question": "Heartbleed's test score is N/A because…", "options": ["there are no Heartbleed rows in the held-out test", "its score was exactly zero", "the test was not run", "it was removed from the dataset"], "correct": 0, "explanation": "Heartbleed has 20 custom windows from one conversation, all kept on fitting sides. With no held-out examples, its test score is not available."}, {"question": "Why keep related conversations and linked patterns in one split group?", "options": ["to make every partition exactly 20%", "to remove all BENIGN rows", "to reduce the chance that near-related rows appear on both fitting and held-out sides", "to increase the number of attack labels"], "correct": 2, "explanation": "Keeping related rows together helps avoid evaluating on data that is too similar to rows used for fitting. Group sizes also mean exact target shares are not guaranteed."}, {"question": "What does Macro F1 do?", "options": ["count every correct row and divide by all rows", "average class F1 scores equally for classes with held-out support", "measure only BENIGN false alarms", "average the model's training time"], "correct": 1, "explanation": "Macro F1 gives each supported class equal weight in the average, unlike accuracy, which counts individual rows."}, {"question": "Which statement about T1's final test is correct?", "options": ["It was refitted on training plus validation before scoring", "It was chosen after comparing test results", "It scored exactly the same as its CV mean", "It scored 85.77% supported-class Macro F1 and 99.51% accuracy without a refit"], "correct": 3, "explanation": "T1 was frozen before the test and the saved training-only model was used without refitting. Its test Macro F1 was 85.77% and accuracy was 99.51%."}, {"question": "What was compared in the separate official-flow study?", "options": ["77 official inputs against 15 flow analogs on the same filtered rows and folds", "T1's 15 custom predictors against 77 features on the final test", "two new test sets after retraining T1", "packet rows against unlabeled rows"], "correct": 0, "explanation": "The matched official-flow study compared a 77-input representation with 15 flow-level analogs on the same filtered cohort. The 15 analogs are not T1's custom window inputs."}, {"question": "What can be concluded from only three grouped CV folds?", "options": ["the ranking is statistically certain", "all rare attacks will be detected in future", "the observed fold results and their spread can be reported, but they do not establish statistical certainty", "the final test should be used for another model search"], "correct": 2, "explanation": "Three folds provide a useful observed comparison, not statistical certainty. The reserved test must remain separate from another model search."}], "sources": [{"title": "Official CICIDS2017 dataset page", "url": "https://www.unb.ca/cic/datasets/ids-2017.html", "access": "public", "why": "Describes the five-day dataset, packet captures, labeled flow files, and attack types."}, {"title": "Project reviewer home", "url": "https://landotin.github.io/cicids2017-project-reviewer/", "access": "public", "why": "The self-contained reviewer presents the workflow and conclusions in plain language."}, {"title": "Schema checks", "url": "https://landotin.github.io/cicids2017-project-reviewer/evidence/schema_checks.csv", "access": "public", "why": "Aggregate checks for all five 47-column annotated packet files and five 19-column prepared files."}, {"title": "Partition summary", "url": "https://landotin.github.io/cicids2017-project-reviewer/evidence/partition_summary.csv", "access": "public", "why": "Saved train, validation, and test row counts and shares."}, {"title": "Class support by partition", "url": "https://landotin.github.io/cicids2017-project-reviewer/evidence/class_support.csv", "access": "public", "why": "Shows how many examples of each class are in training, validation, and test."}, {"title": "Custom model validation results", "url": "https://landotin.github.io/cicids2017-project-reviewer/evidence/custom_validation.csv", "access": "public", "why": "Aggregate validation measurements for the custom model candidates."}, {"title": "First-version validation results", "url": "https://landotin.github.io/cicids2017-project-reviewer/evidence/v1_validation.csv", "access": "public", "why": "Aggregate validation scores for the original A–E model candidates."}, {"title": "First-version grouped CV results", "url": "https://landotin.github.io/cicids2017-project-reviewer/evidence/v1_cv.csv", "access": "public", "why": "Mean and variation of the original A–E scores across three grouped folds."}, {"title": "Custom grouped CV fold results", "url": "https://landotin.github.io/cicids2017-project-reviewer/evidence/custom_cv_folds.csv", "access": "public", "why": "Shows T1 and T3 scores on each of the three saved grouped folds."}, {"title": "Custom model ranking", "url": "https://landotin.github.io/cicids2017-project-reviewer/evidence/custom_ranking.csv", "access": "public", "why": "Records the eligible custom models ranked by grouped CV and the selection measurements."}, {"title": "Final test metrics", "url": "https://landotin.github.io/cicids2017-project-reviewer/evidence/final_test_metrics.csv", "access": "public", "why": "Aggregate T1 test metrics, including supported-class Macro F1, accuracy, and BENIGN false alarms."}, {"title": "Final test per-class results", "url": "https://landotin.github.io/cicids2017-project-reviewer/evidence/final_test_per_class.csv", "access": "public", "why": "Per-class precision, recall, F1, and test support for the frozen T1 model."}, {"title": "Official-flow summary results", "url": "https://landotin.github.io/cicids2017-project-reviewer/evidence/official_summary.csv", "access": "public", "why": "Aggregate measurements for the 15 flow analog and 77 official-input arms."}, {"title": "Official-flow fold results", "url": "https://landotin.github.io/cicids2017-project-reviewer/evidence/official_folds.csv", "access": "public", "why": "Shows each official feature arm's scores and held-out row counts in all three folds."}, {"title": "Official-flow paired fold differences", "url": "https://landotin.github.io/cicids2017-project-reviewer/evidence/official_paired_folds.csv", "access": "public", "why": "Shows the 77-input minus 15-analog Macro F1 difference on each matched fold."}, {"title": "Official-flow per-class results", "url": "https://landotin.github.io/cicids2017-project-reviewer/evidence/official_class_f1.csv", "access": "public", "why": "Pairs official-flow class scores with held-out support."}, {"title": "Evidence provenance record", "url": "https://landotin.github.io/cicids2017-project-reviewer/evidence/provenance.json", "access": "public", "why": "Lists the aggregate evidence files, source paths, review date, and scope."}, {"title": "Original project repository", "url": "https://github.com/xtian413/CICIDS2017-Attack-Classification", "access": "project", "why": "Contains the project's original reports, data pipeline description, and saved-result documentation."}, {"title": "Original model development report", "url": "https://github.com/xtian413/CICIDS2017-Attack-Classification/blob/5170ec1458c05dd8fe230cccb157a52af47fb1b4/docs/MODEL_DEVELOPMENT_REPORT.md", "access": "project", "why": "The full model timeline, experiments, model selection, and final result; project access may be required."}, {"title": "Original data pipeline report", "url": "https://github.com/xtian413/CICIDS2017-Attack-Classification/blob/5170ec1458c05dd8fe230cccb157a52af47fb1b4/docs/DATA_PIPELINE.md", "access": "project", "why": "The saved row, column, feature, label, and split definitions; project access may be required."}, {"title": "Original final test analysis", "url": "https://github.com/xtian413/CICIDS2017-Attack-Classification/blob/5170ec1458c05dd8fe230cccb157a52af47fb1b4/docs/FINAL_TEST_ANALYSIS.md", "access": "project", "why": "The final T1 test scores, class support, false alarms, and interpretation limits; project access may be required."}, {"title": "Original official-flow results report", "url": "https://github.com/xtian413/CICIDS2017-Attack-Classification/blob/5170ec1458c05dd8fe230cccb157a52af47fb1b4/docs/OFFICIAL_FEATURE_RESULTS.md", "access": "project", "why": "The separate filtered official-flow comparison and its limits; project access may be required."}, {"title": "Model development Google Doc", "url": "https://docs.google.com/document/d/1V5azZkm9MXk1F7bi0tgn-7g3P91gt8YKZ8TyjTF1kp4/edit", "access": "project", "why": "The maintained project report with model decisions, final results, and review limits; project access may be required."}, {"title": "Notebook 05: official-flow feature comparison", "url": "https://colab.research.google.com/drive/1boNZOlTeAckcKQHqhOzQReeSyWgTIZsK", "access": "project", "why": "The completed notebook for the separate official-flow comparison; project access may be required."}]};
+window.REVIEWER_FACTS = {"dataset": {"preparedRows": 2506919, "labeledRows": 2453662, "unlabeledRows": 53257, "trainingClasses": 15, "evaluatedClasses": 14, "rawColumns": 47, "preparedColumns": 19, "baselinePredictors": 15, "splitColumns": 23, "heartbleedWindows": 20, "baselineFeatures": ["protocol", "duration_seconds", "packet_count", "total_bytes", "mean_packet_bytes", "min_packet_bytes", "max_packet_bytes", "forward_packet_count", "backward_packet_count", "forward_bytes", "backward_bytes", "syn_count", "ack_count", "fin_count", "rst_count"]}, "split": {"id": "split_68ab64fbdd2b", "folds": 3, "groups": 991134, "parts": [{"name": "train", "rows": 1472712, "share": 0.6002098088489776}, {"name": "validation", "rows": 481841, "share": 0.19637627350466363}, {"name": "test", "rows": 499109, "share": 0.2034139176463588}], "heartbleedPolicy": "All 20 custom Heartbleed windows belong to one conversation and stay on fitting sides. Independent validation/test scores are N/A."}, "models": [{"name": "A", "features": 15, "featureDescription": "Original 15 predictors", "weight": "None", "depth": 12, "leaf": 2, "validationMacroF1": 0.6181677550509982, "validationAccuracy": 0.9939025529168336, "validationFalseAlarmRate": 0.0041174574700122675, "cvMacroF1": 0.5900162995194326, "cvSd": 0.067692960354492, "selected": false, "notes": "All models use 80 trees and seed 42."}, {"name": "B", "features": 15, "featureDescription": "Original 15 predictors", "weight": "Balanced", "depth": 12, "leaf": 2, "validationMacroF1": 0.7412991547817777, "validationAccuracy": 0.9935663424241606, "validationFalseAlarmRate": 0.007118104570427761, "cvMacroF1": 0.6537356009358827, "cvSd": 0.08010887347210258, "selected": false, "notes": "All models use 80 trees and seed 42."}, {"name": "C", "features": 19, "featureDescription": "15 original predictors + 4 calculated values", "weight": "Balanced", "depth": 12, "leaf": 2, "validationMacroF1": 0.7402119114753775, "validationAccuracy": 0.9932799408933652, "validationFalseAlarmRate": 0.007537845380477555, "cvMacroF1": 0.660975600848486, "cvSd": 0.08668207620224483, "selected": false, "notes": "All models use 80 trees and seed 42."}, {"name": "D", "features": 8, "featureDescription": "8 selected from the original 15", "weight": "Balanced", "depth": 12, "leaf": 2, "validationMacroF1": 0.7393422041378234, "validationAccuracy": 0.9927195900722438, "validationFalseAlarmRate": 0.008072515221850507, "cvMacroF1": 0.6068875855794945, "cvSd": 0.11461996188700309, "selected": false, "notes": "All models use 80 trees and seed 42."}, {"name": "E", "features": 12, "featureDescription": "12 selected from the expanded 19", "weight": "Balanced", "depth": 12, "leaf": 2, "validationMacroF1": 0.721028899274233, "validationAccuracy": 0.9926967609647166, "validationFalseAlarmRate": 0.008244908768835244, "cvMacroF1": 0.6502730489099036, "cvSd": 0.11131884610216489, "selected": false, "notes": "All models use 80 trees and seed 42."}, {"name": "W1", "features": 15, "featureDescription": "Original 15 predictors", "weight": "Square root of balanced", "depth": 12, "leaf": 2, "validationMacroF1": 0.7500635060782894, "validationAccuracy": 0.9948426970722707, "validationFalseAlarmRate": 0.005579054933578516, "cvMacroF1": null, "cvSd": null, "selected": false, "notes": "CV Not run: this trial was not shortlisted."}, {"name": "T1", "features": 15, "featureDescription": "Original 15 predictors", "weight": "Balanced", "depth": 20, "leaf": 2, "validationMacroF1": 0.7774609109234036, "validationAccuracy": 0.9949443903694373, "validationFalseAlarmRate": 0.005634020992037417, "cvMacroF1": 0.714279003730609, "cvSd": 0.08490393370391222, "selected": true, "notes": "All models use 80 trees and seed 42."}, {"name": "T2", "features": 15, "featureDescription": "Original 15 predictors", "weight": "Balanced", "depth": 12, "leaf": 1, "validationMacroF1": 0.7359706769349444, "validationAccuracy": 0.9936638849745041, "validationFalseAlarmRate": 0.007063138511968859, "cvMacroF1": null, "cvSd": null, "selected": false, "notes": "CV Not run: this trial was not shortlisted."}, {"name": "T3", "features": 15, "featureDescription": "Original 15 predictors", "weight": "Balanced", "depth": 20, "leaf": 1, "validationMacroF1": 0.7738440334807801, "validationAccuracy": 0.9949485411162603, "validationFalseAlarmRate": 0.005576556476375838, "cvMacroF1": 0.7132582575872101, "cvSd": 0.08207058330956568, "selected": false, "notes": "All models use 80 trees and seed 42."}], "test": {"model": "T1", "rows": 499109, "date": "2026-10-21", "macroF1": 0.8577381515094958, "accuracy": 0.9951493561526641, "precision": 0.8468051690619737, "recall": 0.8905623371227994, "kappa": 0.9835602500068606, "falseAlarms": 2218, "benignRows": 417513, "falseAlarmRate": 0.005312409433957745, "perClass": [{"label": "BENIGN", "support": 417513, "precision": 0.9998483236148094, "recall": 0.9946875905660423, "f1": 0.9972612805584539}, {"label": "Bot", "support": 442, "precision": 0.4579339723109691, "recall": 0.9728506787330317, "f1": 0.6227371469949312}, {"label": "DDoS", "support": 13190, "precision": 0.9980300045461433, "recall": 0.9986353297952995, "f1": 0.9983325754130665}, {"label": "DoS GoldenEye", "support": 1935, "precision": 0.9474987617632491, "recall": 0.9886304909560724, "f1": 0.9676277187658068}, {"label": "DoS Hulk", "support": 30820, "precision": 0.9997076023391813, "recall": 0.9984101232965606, "f1": 0.9990584415584416}, {"label": "DoS Slowhttptest", "support": 1305, "precision": 0.9483282674772037, "recall": 0.9563218390804598, "f1": 0.9523082792827166}, {"label": "DoS slowloris", "support": 692, "precision": 0.9637377963737797, "recall": 0.9985549132947977, "f1": 0.9808374733853797}, {"label": "FTP-Patator", "support": 611, "precision": 0.9983633387888707, "recall": 0.9983633387888707, "f1": 0.9983633387888707}, {"label": "Heartbleed", "support": 0, "precision": null, "recall": null, "f1": null}, {"label": "Infiltration", "support": 13, "precision": 0.625, "recall": 0.38461538461538464, "f1": 0.47619047619047616}, {"label": "PortScan", "support": 31800, "precision": 0.9530346171137419, "recall": 0.999937106918239, "f1": 0.9759226578684876}, {"label": "SSH-Patator", "support": 705, "precision": 1.0, "recall": 0.9943262411347518, "f1": 0.9971550497866287}, {"label": "Web Attack – Brute Force", "support": 63, "precision": 0.6825396825396826, "recall": 0.6825396825396826, "f1": 0.6825396825396826}, {"label": "Web Attack – Sql Injection", "support": 2, "precision": 1.0, "recall": 1.0, "f1": 1.0}, {"label": "Web Attack – XSS", "support": 18, "precision": 0.28125, "recall": 0.5, "f1": 0.36}]}, "official": {"eligibleRows": 1126067, "scoredRows": 1126058, "groups": 536179, "heartbleedFlows": 9, "arms": [{"id": "flow_analogs_15", "title": "15 official flow analogs", "features": 15, "macroF1": 0.804194478857395, "sd": 0.02977560263585859, "falseAlarmRate": 0.0033092289257429, "accuracy": 0.9939575555472544, "kappa": 0.9729613966377645, "fitSeconds": 145.6339316360004, "predictionSeconds": 2.247846612000103, "falseAlarms": 3154, "errors": 6367}, {"id": "fuller_official", "title": "77 official traffic measurements", "features": 77, "macroF1": 0.8198235744458914, "sd": 0.014296044729177112, "falseAlarmRate": 0.0011011465695906668, "accuracy": 0.996710314890839, "kappa": 0.9852635085963568, "fitSeconds": 422.69566807200044, "predictionSeconds": 3.0614562539999497, "falseAlarms": 1057, "errors": 3437}], "gain": 0.015629095588496345, "pairedFoldGains": [0.0046655106702425675, 0.03405485127328356, 0.008166924821962906], "correctedErrors": 3107, "introducedErrors": 177, "rareClasses": [{"label": "Heartbleed", "support": 0, "f1": null}, {"label": "Infiltration", "support": 25, "f1": 0.0}, {"label": "Web Attack – Sql Injection", "support": 5, "f1": 0.0}, {"label": "Web Attack – XSS", "support": 15, "f1": 0.7367724867724869}], "notes": ["Both feature sets use the same eligible official flow records and three saved training folds.", "Fixed T1 settings: 80 trees, depth 20, minimum leaf size 2, balanced weights, seed 42, two CPU workers.", "Median imputation and class weights are fitted using only the current fitting side.", "The 15 flow analogs approximate our design on official flows; they are different inputs from T1’s custom windows.", "Three folds show a consistent direction here; they do not establish statistical certainty.", "The cohort is filtered. Its scores describe retained records, not the complete official dataset.", "No replacement model was selected and the frozen T1 final test was not repeated.", "False-alarm rates shown here are unweighted fold means; counts below are pooled across folds.", "Prediction time includes imputation, uses three repeats after a warm-up, and excludes loading, feature construction, and scoring."]}, "classSupport": [{"label": "BENIGN", "train": 1218005, "validation": 400247, "test": 417513}, {"label": "Bot", "train": 1327, "validation": 443, "test": 442}, {"label": "DDoS", "train": 39571, "validation": 13191, "test": 13190}, {"label": "DoS GoldenEye", "train": 6865, "validation": 1935, "test": 1935}, {"label": "DoS Hulk", "train": 92460, "validation": 30820, "test": 30820}, {"label": "DoS Slowhttptest", "train": 6162, "validation": 1305, "test": 1305}, {"label": "DoS slowloris", "train": 8659, "validation": 693, "test": 692}, {"label": "FTP-Patator", "train": 1831, "validation": 611, "test": 611}, {"label": "Heartbleed", "train": 20, "validation": 0, "test": 0}, {"label": "Infiltration", "train": 58, "validation": 11, "test": 13}, {"label": "PortScan", "train": 95390, "validation": 31796, "test": 31800}, {"label": "SSH-Patator", "train": 2115, "validation": 705, "test": 705}, {"label": "Web Attack – Brute Force", "train": 189, "validation": 63, "test": 63}, {"label": "Web Attack – Sql Injection", "train": 5, "validation": 2, "test": 2}, {"label": "Web Attack – XSS", "train": 55, "validation": 19, "test": 18}], "provenance": {"sourceRevision": "5170ec1458c05dd8fe230cccb157a52af47fb1b4", "reviewedDate": "2026-10-23", "sourceRepository": "https://github.com/xtian413/CICIDS2017-Attack-Classification"}};
+</script>
+  <script>
+  (function () {
+    "use strict";
+
+    const content = window.REVIEWER_CONTENT || {};
+    const facts = window.REVIEWER_FACTS || {};
+    const project = content.project || {};
+    const workflow = Array.isArray(content.workflow) ? content.workflow : [];
+    const stages = Array.isArray(content.stages) ? content.stages : [];
+    const glossary = Array.isArray(content.glossary) ? content.glossary : [];
+    const practice = Array.isArray(content.practice) ? content.practice : [];
+    const quiz = Array.isArray(content.quiz) ? content.quiz : [];
+    const sources = Array.isArray(content.sources) ? content.sources : [];
+    const models = Array.isArray(facts.models) ? facts.models : [];
+    const dataset = facts.dataset || {};
+    const split = facts.split || {};
+    const test = facts.test || {};
+    const official = facts.official || {};
+    const state = { tab: "project", stage: "", phase: "", findingMode: "custom", reviewed: [], storageOK: true };
+    const storageKey = "cicids2017-reviewer-progress-v1";
+
+    function escapeHTML(value) {
+      return String(value == null ? "" : value).replace(/[&<>"']/g, function (char) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[char];
+      });
+    }
+    function safeText(value, fallback) {
+      return value == null || value === "" ? (fallback || "N/A") : String(value);
+    }
+    function percent(value, digits) {
+      if (value == null || !Number.isFinite(Number(value))) return "N/A";
+      return (Number(value) * 100).toFixed(digits == null ? 2 : digits) + "%";
+    }
+    function percentagePoints(value, digits) {
+      if (value == null || !Number.isFinite(Number(value))) return "N/A";
+      return (Number(value) * 100).toFixed(digits == null ? 2 : digits) + " pp";
+    }
+    function integer(value) {
+      if (value == null || !Number.isFinite(Number(value))) return "N/A";
+      return Math.round(Number(value)).toLocaleString("en-US");
+    }
+    function decimal(value, digits) {
+      if (value == null || !Number.isFinite(Number(value))) return "N/A";
+      return Number(value).toFixed(digits == null ? 2 : digits);
+    }
+    function seconds(value) {
+      if (value == null || !Number.isFinite(Number(value))) return "N/A";
+      return decimal(value, 2) + " s";
+    }
+    function slug(value) {
+      return String(value == null ? "" : value).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "item";
+    }
+    function arrayOrEmpty(value) { return Array.isArray(value) ? value : []; }
+    function byId(list, id, fallbackIndex) {
+      const found = list.find(function (item) { return item && String(item.id) === String(id); });
+      return found || list[fallbackIndex || 0] || null;
+    }
+    function safeLink(url) {
+      const raw = String(url == null ? "" : url).trim();
+      if (!raw) return "";
+      if (/^[a-z][a-z0-9+.-]*:/i.test(raw)) {
+        try {
+          const absolute = new URL(raw);
+          return absolute.protocol === "https:" || absolute.protocol === "http:" ? absolute.href : "";
+        } catch (error) { return ""; }
+      }
+      if (raw.slice(0, 2) === "//") return "";
+      try {
+        const parsed = new URL(raw, window.location.href);
+        if (parsed.origin === window.location.origin) return raw;
+      } catch (error) { return ""; }
+      return "";
+    }
+    function setText(id, value) {
+      const node = document.getElementById(id);
+      if (node) node.textContent = value == null ? "" : String(value);
+    }
+    function metricCard(name, value, note) {
+      return '<article class="metric-card"><span class="metric-name">' + escapeHTML(name) + '</span><strong class="metric-value">' + escapeHTML(value) + '</strong><span class="metric-note">' + escapeHTML(note || "") + '</span></article>';
+    }
+    function sourceBadge(access) {
+      const isProject = String(access || "").toLowerCase() === "project";
+      return '<span class="access-label' + (isProject ? ' project' : '') + '">' + (isProject ? 'Project member access' : 'Public evidence') + '</span>';
+    }
+
+    function renderHeader() {
+      const meta = content.meta || {};
+      const title = safeText(meta.title, "CICIDS2017 project reviewer");
+      document.title = title + " · reviewer";
+      setText("site-title", title);
+      setText("site-subtitle", safeText(meta.subtitle, "A guided review of the dataset, workflow, findings, and practice questions."));
+      setText("reviewed-date", meta.reviewedDate ? "Reviewed " + meta.reviewedDate : "");
+      setText("project-headline", safeText(project.headline, title));
+      setText("project-intro", safeText(project.intro, ""));
+    }
+
+    function renderProject() {
+      const stories = [
+        { label: "Purpose", title: "The goal", text: project.goal },
+        { label: "Research pitch", title: "The approach", text: project.pitch }
+      ];
+      arrayOrEmpty(project.gaps).forEach(function (gap, index) {
+        stories.push({ label: "Project question " + String(index + 1).padStart(2, "0"), title: gap.title, text: gap.observed, prompt: gap.question, action: gap.action, learned: gap.learned });
+      });
+      document.getElementById("project-story").innerHTML = stories.map(function (item, index) {
+        const more = item.prompt ? '<details class="gap-detail"><summary>Our decision and finding</summary><div><p><strong>Project question:</strong> ' + escapeHTML(item.prompt) + '</p>' + (item.action ? '<p><strong>What we did:</strong> ' + escapeHTML(item.action) + '</p>' : "") + (item.learned ? '<p><strong>What we learned:</strong> ' + escapeHTML(item.learned) + '</p>' : "") + '</div></details>' : "";
+        return '<article class="paper-card story-card"><span class="index">' + escapeHTML(item.label || String(index + 1).padStart(2, "0")) + '</span><h4>' + escapeHTML(safeText(item.title, "Project note")) + '</h4><p>' + escapeHTML(safeText(item.text, "")) + '</p>' + more + '</article>';
+      }).join("");
+
+      const scopeFacts = [
+        ["Prepared rows", dataset.preparedRows], ["Labeled rows", dataset.labeledRows], ["Unlabeled rows", dataset.unlabeledRows],
+        ["Training classes", dataset.trainingClasses], ["Evaluated classes", dataset.evaluatedClasses], ["Raw columns", dataset.rawColumns],
+        ["Prepared columns", dataset.preparedColumns], ["Baseline predictors", dataset.baselinePredictors], ["Split columns", dataset.splitColumns]
+      ];
+      document.getElementById("dataset-facts").innerHTML = scopeFacts.map(function (item) {
+        return '<div class="fact-cell"><strong class="value">' + escapeHTML(typeof item[1] === "number" ? integer(item[1]) : safeText(item[1])) + '</strong><span class="label">' + escapeHTML(item[0]) + '</span></div>';
+      }).join("");
+
+      const modelC = models.find(function (model) { return String(model.name).toUpperCase() === "C"; }) || {};
+      const baselineFeatureNames = arrayOrEmpty(dataset.baselineFeatures);
+      const featureNote = document.getElementById("feature-scope-note");
+      featureNote.innerHTML = '<strong>Feature counts describe different inputs.</strong> The baseline uses ' + escapeHTML(integer(dataset.baselinePredictors)) + ' predictors, with metadata kept separate. Model C uses ' + escapeHTML(integer(modelC.features)) + ' inputs; that is a different feature set, not a larger baseline predictor count.' + (baselineFeatureNames.length ? '<details><summary>See baseline predictor names</summary><ul class="feature-name-list">' + baselineFeatureNames.map(function (name) { return '<li>' + escapeHTML(name) + '</li>'; }).join("") + '</ul></details>' : "");
+
+      document.getElementById("stage-flow").innerHTML = stages.map(function (stage, index) {
+        const id = safeText(stage.id, "stage-" + index);
+        const pressed = (state.stage && state.stage === id) || (!state.stage && index === 0);
+        return '<button class="stage-button" type="button" data-stage="' + escapeHTML(id) + '" aria-pressed="' + (pressed ? "true" : "false") + '"><span class="stage-number">Stage ' + String(index + 1).padStart(2, "0") + '</span><strong>' + escapeHTML(safeText(stage.title, "Data stage")) + '</strong><small>' + escapeHTML(safeText(stage.countLabel, "Select for details")) + '</small></button>';
+      }).join("");
+      document.getElementById("stage-details").innerHTML = stages.map(function (stage, index) {
+        const id = safeText(stage.id, "stage-" + index);
+        return '<article class="paper-card stage-detail" id="stage-detail-' + escapeHTML(slug(id)) + '" data-stage-detail="' + escapeHTML(id) + '"' + (index === 0 && !state.stage ? "" : " hidden") + '><div><p class="micro-label">' + escapeHTML(safeText(stage.countLabel, "Data stage")) + '</p><h4>' + escapeHTML(safeText(stage.title, "Data stage")) + '</h4><p class="stage-rowmeaning"><strong>What one row means:</strong> ' + escapeHTML(safeText(stage.rowMeaning, "")) + '</p></div><div class="stage-explanation"><p>' + escapeHTML(safeText(stage.explanation, "")) + '</p><p>' + escapeHTML(safeText(stage.detail, "")) + '</p></div></article>';
+      }).join("");
+      if (stages.length) {
+        const initial = state.stage || String(stages[0].id);
+        activateStage(initial, false);
+      }
+
+      document.getElementById("project-boundaries").innerHTML = arrayOrEmpty(project.boundaries).map(function (line) { return '<li>' + escapeHTML(line) + '</li>'; }).join("");
+      document.getElementById("source-list").innerHTML = sources.map(function (source) {
+        const href = safeLink(source.url);
+        const title = escapeHTML(safeText(source.title, "Evidence link"));
+        const link = href ? '<a href="' + escapeHTML(href) + '" target="_blank" rel="noopener noreferrer">' + title + '</a>' : title;
+        return '<article class="paper-card source-card">' + sourceBadge(source.access) + '<h4>' + link + '</h4><p>' + escapeHTML(safeText(source.why, "")) + '</p></article>';
+      }).join("");
+      setText("sources-summary", "Show evidence links (" + sources.length + ")");
+      setText("source-note", sources.length ? "Public links identify openly available evidence. Project member links point to original reports, the document, or notebook and may require access." : "No evidence links were included in this build.");
+
+      document.getElementById("glossary-list").innerHTML = glossary.map(function (item, index) {
+        return '<details data-glossary-entry><summary>' + escapeHTML(safeText(item.term, "Term " + (index + 1))) + '</summary><p><strong>' + escapeHTML(safeText(item.plain, "")) + '</strong>' + (item.detail ? ' ' + escapeHTML(item.detail) : "") + '</p></details>';
+      }).join("");
+    }
+
+    function activateStage(id, updateHash) {
+      const match = byId(stages, id, 0);
+      if (!match) return;
+      state.stage = String(match.id);
+      document.querySelectorAll("[data-stage]").forEach(function (button) { button.setAttribute("aria-pressed", String(button.getAttribute("data-stage") === state.stage)); });
+      document.querySelectorAll("[data-stage-detail]").forEach(function (panel) { panel.hidden = panel.getAttribute("data-stage-detail") !== state.stage; });
+      if (updateHash) writeHash("project/stages/" + encodeURIComponent(state.stage));
+    }
+
+    function loadProgress() {
+      try {
+        const saved = window.localStorage.getItem(storageKey);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) state.reviewed = parsed.filter(function (id) { return workflow.some(function (phase) { return String(phase.id) === String(id); }); });
+        }
+      } catch (error) {
+        state.storageOK = false;
+      }
+    }
+    function saveProgress() {
+      try { window.localStorage.setItem(storageKey, JSON.stringify(state.reviewed)); state.storageOK = true; }
+      catch (error) { state.storageOK = false; }
+      updateProgressUI();
+    }
+    function updateProgressUI() {
+      const count = state.reviewed.length;
+      setText("progress-count", count + " of " + workflow.length);
+      const fill = document.getElementById("progress-fill");
+      if (fill) fill.style.width = workflow.length ? ((count / workflow.length) * 100) + "%" : "0%";
+      const bar = document.querySelector("[role=progressbar]");
+      if (bar) bar.setAttribute("aria-valuenow", String(count));
+      const note = document.getElementById("progress-note");
+      if (note) note.textContent = state.storageOK ? "Progress is kept in this browser when storage is available." : "Browser storage is unavailable; marks will remain only until this page closes.";
+      document.querySelectorAll("[data-review-phase]").forEach(function (input) { input.checked = state.reviewed.indexOf(input.getAttribute("data-review-phase")) >= 0; });
+    }
+
+    function renderWorkflow() {
+      document.getElementById("phase-nav").innerHTML = workflow.map(function (phase, index) {
+        return '<button class="phase-button" type="button" data-phase="' + escapeHTML(safeText(phase.id, "phase-" + index)) + '" aria-current="' + (index === 0 ? "step" : "false") + '"><span class="phase-no">' + String(index + 1).padStart(2, "0") + '</span><span class="phase-name">' + escapeHTML(safeText(phase.title, "Workflow phase")) + '</span></button>';
+      }).join("");
+      document.getElementById("workflow-content").innerHTML = workflow.map(function (phase, index) {
+        const id = safeText(phase.id, "phase-" + index);
+        const detailList = arrayOrEmpty(phase.details).map(function (line) { return '<li>' + escapeHTML(line) + '</li>'; }).join("");
+        const previous = index > 0 ? '<button class="button small no-print" type="button" data-phase-jump="' + escapeHTML(workflow[index - 1].id) + '">← Previous</button>' : '<span></span>';
+        const next = index < workflow.length - 1 ? '<button class="button small primary no-print" type="button" data-phase-jump="' + escapeHTML(workflow[index + 1].id) + '">Next phase →</button>' : '<span></span>';
+        return '<article class="phase-panel" data-phase-panel="' + escapeHTML(id) + '"' + (index === 0 ? "" : " hidden") + '><div class="phase-titleline"><span class="large-number" aria-hidden="true">' + String(index + 1).padStart(2, "0") + '</span><div><h3>' + escapeHTML(safeText(phase.title, "Workflow phase")) + '</h3><p class="plain">' + escapeHTML(safeText(phase.plain, "")) + '</p></div></div><p class="phase-copy">' + escapeHTML(safeText(phase.what, "")) + '</p><div class="phase-block"><h4>Why this phase matters</h4><p>' + escapeHTML(safeText(phase.why, "")) + '</p></div><div class="phase-io"><div class="io-card"><strong>Input</strong><p>' + escapeHTML(safeText(phase.input, "")) + '</p></div><div class="io-card"><strong>Output</strong><p>' + escapeHTML(safeText(phase.output, "")) + '</p></div></div><div class="finding-callout"><strong>What the review found</strong>' + escapeHTML(safeText(phase.finding, "")) + '</div>' + (detailList ? '<details class="workflow-more"><summary>Show more detail</summary><ul class="phase-details">' + detailList + '</ul></details>' : "") + '<div class="spoken-box"><span class="micro-label">Say it aloud</span><p>' + escapeHTML(safeText(phase.spoken, "")) + '</p></div><label class="review-phase-control no-print"><input type="checkbox" data-review-phase="' + escapeHTML(id) + '"> Mark this phase reviewed</label><div class="phase-controls no-print">' + previous + '<span class="step-count">' + (index + 1) + ' / ' + workflow.length + '</span>' + next + '</div></article>';
+      }).join("");
+      if (workflow.length) {
+        const index = workflow.findIndex(function (phase) { return String(phase.id) === String(state.phase); });
+        state.phase = index >= 0 ? String(workflow[index].id) : String(workflow[0].id);
+        activatePhase(state.phase, false);
+      }
+      updateProgressUI();
+    }
+
+    function activatePhase(id, updateHash) {
+      const index = workflow.findIndex(function (phase) { return String(phase.id) === String(id); });
+      if (index < 0) return;
+      state.phase = String(workflow[index].id);
+      document.querySelectorAll("[data-phase]").forEach(function (button) {
+        const active = button.getAttribute("data-phase") === state.phase;
+        button.setAttribute("aria-current", active ? "step" : "false");
+      });
+      document.querySelectorAll("[data-phase-panel]").forEach(function (panel) { panel.hidden = panel.getAttribute("data-phase-panel") !== state.phase; });
+      document.querySelectorAll("[data-phase-jump]").forEach(function (button) { button.disabled = button.getAttribute("data-phase-jump") === state.phase; });
+      updateProgressUI();
+      if (updateHash) writeHash("workflow/" + encodeURIComponent(state.phase));
+    }
+
+    function renderCustomFindings() {
+      const t1 = models.find(function (model) { return String(model.name).toUpperCase() === "T1"; }) || {};
+      const meta = content.meta || {};
+      setText("custom-context", "T1 frozen final test · reviewed " + safeText(test.date || meta.reviewedDate, "date not specified"));
+      document.getElementById("custom-metrics").innerHTML = [
+        metricCard("T1 test · macro F1", percent(test.macroF1), "Frozen held-out test"),
+        metricCard("T1 test · accuracy", percent(test.accuracy), integer(test.rows) + " evaluated rows"),
+        metricCard("T1 training · grouped CV F1", t1.cvMacroF1 == null ? "Not run" : percent(t1.cvMacroF1), "Fold mean; SD " + (t1.cvSd == null ? "Not run" : percentagePoints(t1.cvSd))),
+        metricCard("T1 test · false alarm rate", percent(test.falseAlarmRate), integer(test.falseAlarms) + " false alarms among " + integer(test.benignRows) + " benign rows")
+      ].join("");
+
+      const parts = arrayOrEmpty(split.parts);
+      const maxShare = Math.max.apply(null, parts.map(function (part) { return Number(part.share) || 0; }).concat([0.0001]));
+      document.getElementById("split-parts").innerHTML = parts.map(function (part) {
+        const share = Number(part.share);
+        const width = Number.isFinite(share) ? Math.max(0, Math.min(100, (share / maxShare) * 100)) : 0;
+        return '<div class="split-part"><span class="part-name">' + escapeHTML(safeText(part.name, "Split part")) + '</span><div class="split-bar" role="img" aria-label="' + escapeHTML(safeText(part.name, "Split part") + ": " + integer(part.rows) + " rows, " + percent(part.share)) + '"><span class="bar-fill" style="width:' + width.toFixed(2) + '%">' + escapeHTML(percent(part.share)) + '</span></div><span class="split-meta">' + escapeHTML(integer(part.rows)) + ' rows · ' + escapeHTML(percent(part.share)) + '</span></div>';
+      }).join("");
+      document.getElementById("split-meta").innerHTML = [
+        ["Groups", split.groups], ["Folds", split.folds], ["Heartbleed policy", split.heartbleedPolicy]
+      ].map(function (item) {
+        return '<div class="support-stat"><strong>' + escapeHTML(typeof item[1] === "number" ? integer(item[1]) : safeText(item[1])) + '</strong><span>' + escapeHTML(item[0]) + '</span></div>';
+      }).join("");
+
+      const summaryRows = [
+        ["Test model", safeText(test.model, "T1")], ["Rows", integer(test.rows)], ["Precision", percent(test.precision)], ["Recall", percent(test.recall)],
+        ["Kappa", decimal(test.kappa, 4)], ["False alarms", integer(test.falseAlarms)], ["Benign support", integer(test.benignRows)], ["False alarm rate", percent(test.falseAlarmRate)]
+      ];
+      document.getElementById("test-summary").innerHTML = summaryRows.map(function (row) { return '<div><dt>' + escapeHTML(row[0]) + '</dt><dd>' + escapeHTML(row[1]) + '</dd></div>'; }).join("");
+
+      document.getElementById("models-table-wrap").innerHTML = '<table><caption class="sr-only">All custom model settings and results</caption><thead><tr><th>Model</th><th>Features</th><th>Feature description</th><th class="numeric">Weight</th><th class="numeric">Depth</th><th class="numeric">Leaf</th><th class="numeric">Validation macro F1</th><th class="numeric">Validation accuracy</th><th class="numeric">CV macro F1 ± SD</th><th class="numeric">Validation FAR</th><th>Selected</th><th>Notes</th></tr></thead><tbody>' + models.map(function (model) {
+        const cv = model.cvMacroF1 == null ? "Not run" : percent(model.cvMacroF1) + (model.cvSd == null ? "" : " ± " + percentagePoints(model.cvSd));
+        return '<tr><td class="model-name">' + escapeHTML(safeText(model.name, "Model")) + '</td><td>' + escapeHTML(safeText(model.features)) + '</td><td>' + escapeHTML(safeText(model.featureDescription)) + '</td><td class="numeric">' + escapeHTML(safeText(model.weight)) + '</td><td class="numeric">' + escapeHTML(safeText(model.depth)) + '</td><td class="numeric">' + escapeHTML(safeText(model.leaf)) + '</td><td class="numeric">' + escapeHTML(percent(model.validationMacroF1)) + '</td><td class="numeric">' + escapeHTML(percent(model.validationAccuracy)) + '</td><td class="numeric">' + escapeHTML(cv) + '</td><td class="numeric">' + escapeHTML(percent(model.validationFalseAlarmRate)) + '</td><td>' + (model.selected ? '<span class="selected-mark">Selected</span>' : '—') + '</td><td>' + escapeHTML(safeText(model.notes, "")) + '</td></tr>';
+      }).join("") + '</tbody></table>';
+
+      const perClass = arrayOrEmpty(test.perClass).slice();
+      if (!perClass.some(function (entry) { return String(entry.label).toLowerCase() === "heartbleed"; })) {
+        perClass.push({ label: "Heartbleed", support: null, precision: null, recall: null, f1: null });
+      }
+      document.getElementById("per-class-table-wrap").innerHTML = '<table><caption class="sr-only">Per-class support and test metrics</caption><thead><tr><th>Class</th><th class="numeric">Test support</th><th class="numeric">Precision</th><th class="numeric">Recall</th><th class="numeric">F1</th></tr></thead><tbody>' + perClass.map(function (entry) {
+        return '<tr><td><strong>' + escapeHTML(safeText(entry.label, "Class")) + '</strong></td><td class="numeric">' + escapeHTML(integer(entry.support)) + '</td><td class="numeric">' + escapeHTML(percent(entry.precision)) + '</td><td class="numeric">' + escapeHTML(percent(entry.recall)) + '</td><td class="numeric">' + escapeHTML(percent(entry.f1)) + '</td></tr>';
+      }).join("") + '</tbody></table>';
+    }
+
+    function officialFeatureLabel(index) {
+      return index === 0 ? "15 flow analogs" : "77 official measurements";
+    }
+    function renderOfficialFindings() {
+      const arms = arrayOrEmpty(official.arms);
+      const groupsLabel = official.groups && typeof official.groups === "object" ? safeText(official.groups.count || official.groups) : integer(official.groups);
+      setText("official-context", "23 October reviewed cohort · cross-validation feature comparison");
+      document.getElementById("official-topline").innerHTML = [
+        ["Eligible rows", integer(official.eligibleRows)], ["Scored rows", integer(official.scoredRows)], ["Groups", groupsLabel], ["Heartbleed flows", integer(official.heartbleedFlows)]
+      ].map(function (item) { return '<div class="official-mini"><strong>' + escapeHTML(item[1]) + '</strong><span>' + escapeHTML(item[0]) + '</span></div>'; }).join("");
+      document.getElementById("official-arms").innerHTML = arms.map(function (arm, index) {
+        const scoreText = percent(arm.macroF1);
+        const numericScore = Number(arm.macroF1);
+        const width = Number.isFinite(numericScore) ? Math.max(0, Math.min(100, numericScore * 100)) : 0;
+        const title = safeText(arm.title, "Feature arm " + (index + 1));
+        const description = typeof arm.features === "number" ? integer(arm.features) + " features in this arm." : safeText(arm.features, officialFeatureLabel(index));
+        const chartLabel = officialFeatureLabel(index) + " mean CV macro F1 " + scoreText;
+        const metrics = [
+          ["SD", arm.sd == null ? "N/A" : percentagePoints(arm.sd)], ["False alarm rate", percent(arm.falseAlarmRate)], ["Accuracy", percent(arm.accuracy)],
+          ["Kappa", decimal(arm.kappa, 4)], ["False alarms", integer(arm.falseAlarms)], ["Fit time", seconds(arm.fitSeconds)], ["Prediction time", seconds(arm.predictionSeconds)], ["Errors", integer(arm.errors)]
+        ];
+        return '<article class="arm-card"><span class="cohort-badge official">' + escapeHTML(officialFeatureLabel(index)) + '</span><h4>' + escapeHTML(title) + '</h4><p class="arm-description">' + escapeHTML(description) + '</p><div class="arm-scoreline"><span>Mean CV macro F1</span><strong>' + escapeHTML(scoreText) + '</strong></div><div class="arm-track" role="img" aria-label="' + escapeHTML(chartLabel) + '"><div class="arm-fill" style="width:' + width.toFixed(2) + '%"></div></div><dl class="arm-metrics">' + metrics.map(function (item) { return '<div><dt>' + escapeHTML(item[0]) + '</dt><dd>' + escapeHTML(item[1]) + '</dd></div>'; }).join("") + '</dl></article>';
+      }).join("");
+
+      const gains = arrayOrEmpty(official.pairedFoldGains);
+      const gainMarkup = gains.length ? '<div class="gain-chips" aria-label="Paired fold gains">' + gains.map(function (gain, index) { return '<span class="gain-chip">Fold ' + (index + 1) + ': ' + escapeHTML(percentagePoints(gain)) + '</span>'; }).join("") + '</div>' : '<p>No paired fold gains were supplied.</p>';
+      document.getElementById("gain-card").innerHTML = '<h4>Paired comparison</h4><div class="gain-big">' + escapeHTML(percentagePoints(official.gain)) + '</div><p>Mean paired macro F1 gain, expressed in percentage points.</p>' + gainMarkup + '<div class="error-pair"><div><strong>' + escapeHTML(integer(official.correctedErrors)) + '</strong><span>Corrected errors</span></div><div><strong>' + escapeHTML(integer(official.introducedErrors)) + '</strong><span>Introduced errors</span></div></div>';
+
+      document.getElementById("rare-classes-table").innerHTML = '<table><caption class="sr-only">Rare class supports and F1 scores in official comparison</caption><thead><tr><th>Rare class</th><th class="numeric">Support</th><th class="numeric">F1</th></tr></thead><tbody>' + arrayOrEmpty(official.rareClasses).map(function (entry) {
+        return '<tr><td><strong>' + escapeHTML(safeText(entry.label, "Class")) + '</strong></td><td class="numeric">' + escapeHTML(integer(entry.support)) + '</td><td class="numeric">' + escapeHTML(percent(entry.f1)) + '</td></tr>';
+      }).join("") + '</tbody></table>';
+      document.getElementById("official-limits").innerHTML = '<h4>Read alongside these limits</h4><ul>' + arrayOrEmpty(official.notes).map(function (note) { return '<li>' + escapeHTML(note) + '</li>'; }).join("") + '</ul>';
+    }
+
+    function setFindingMode(mode, updateHash) {
+      state.findingMode = mode === "official" ? "official" : "custom";
+      document.querySelectorAll("[data-finding-mode]").forEach(function (button) { button.setAttribute("aria-pressed", String(button.getAttribute("data-finding-mode") === state.findingMode)); });
+      document.getElementById("custom-view").hidden = state.findingMode !== "custom";
+      document.getElementById("official-view").hidden = state.findingMode !== "official";
+      if (updateHash) writeHash("findings/" + state.findingMode);
+    }
+
+    function renderPractice() {
+      document.getElementById("practice-grid").innerHTML = practice.map(function (item, index) {
+        return '<article class="practice-card"><span class="practice-no">PROMPT ' + String(index + 1).padStart(2, "0") + '</span><h3>' + escapeHTML(safeText(item.question, "Practice prompt")) + '</h3><details><summary>Reveal answer and spoken version</summary><div class="practice-answer"><p><strong>Answer:</strong> ' + escapeHTML(safeText(item.answer, "")) + '</p><blockquote><strong>Say aloud:</strong> ' + escapeHTML(safeText(item.say, "")) + '</blockquote></div></details></article>';
+      }).join("");
+
+      document.getElementById("quiz-questions").innerHTML = quiz.map(function (item, index) {
+        const correct = Number(item.correct);
+        return '<fieldset class="quiz-question"><legend>' + String(index + 1).padStart(2, "0") + '. ' + escapeHTML(safeText(item.question, "Question")) + '</legend><div class="quiz-options">' + arrayOrEmpty(item.options).map(function (option, optionIndex) {
+          return '<label class="quiz-option"><input type="radio" name="quiz-' + index + '" value="' + optionIndex + '" required><span>' + escapeHTML(option) + '</span></label>';
+        }).join("") + '</div><div class="quiz-feedback quiz-key" hidden><strong>Answer:</strong> ' + escapeHTML(arrayOrEmpty(item.options)[correct]) + '<br>' + escapeHTML(safeText(item.explanation, "")) + '</div></fieldset>';
+      }).join("");
+    }
+
+    function switchTab(tab, updateHash) {
+      const valid = ["project", "workflow", "findings", "practice"].indexOf(tab) >= 0 ? tab : "project";
+      const previousTab = state.tab;
+      state.tab = valid;
+      document.querySelectorAll("[role=tab][data-tab]").forEach(function (button) {
+        const selected = button.getAttribute("data-tab") === valid;
+        button.setAttribute("aria-selected", String(selected));
+        button.tabIndex = selected ? 0 : -1;
+      });
+      document.querySelectorAll(".tab-panel").forEach(function (panel) { panel.hidden = panel.id !== "panel-" + valid; });
+      if (updateHash) {
+        writeHash(valid);
+        if (previousTab !== valid) {
+          const panel = document.getElementById("panel-" + valid);
+          const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+          if (panel) panel.scrollIntoView({ block: "start", behavior: reduceMotion ? "auto" : "smooth" });
+        }
+      }
+    }
+    function writeHash(route) {
+      const next = "#" + route;
+      if (window.location.hash !== next) window.history.replaceState(null, "", next);
+    }
+    function readHash() {
+      const parts = decodeURIComponent(String(window.location.hash || "#project").slice(1)).split("/");
+      const tab = parts[0] || "project";
+      if (tab === "project" && parts[1] === "stages" && parts[2]) activateStage(parts[2], false);
+      if (tab === "workflow" && parts[1]) activatePhase(parts[1], false);
+      if (tab === "findings" && parts[1]) setFindingMode(parts[1], false);
+      switchTab(tab, false);
+    }
+
+    renderHeader();
+    loadProgress();
+    renderProject();
+    renderWorkflow();
+    renderCustomFindings();
+    renderOfficialFindings();
+    renderPractice();
+    readHash();
+
+    document.querySelectorAll("[role=tab][data-tab]").forEach(function (button) {
+      button.addEventListener("click", function () { switchTab(button.getAttribute("data-tab"), true); });
+      button.addEventListener("keydown", function (event) {
+        const tabs = Array.from(document.querySelectorAll("[role=tab][data-tab]"));
+        const index = tabs.indexOf(button);
+        let next = null;
+        if (event.key === "ArrowRight") next = (index + 1) % tabs.length;
+        if (event.key === "ArrowLeft") next = (index - 1 + tabs.length) % tabs.length;
+        if (event.key === "Home") next = 0;
+        if (event.key === "End") next = tabs.length - 1;
+        if (next !== null) { event.preventDefault(); tabs[next].focus(); tabs[next].click(); }
+      });
+    });
+    document.getElementById("stage-flow").addEventListener("click", function (event) {
+      const button = event.target.closest("[data-stage]");
+      if (button) activateStage(button.getAttribute("data-stage"), true);
+    });
+    document.getElementById("phase-nav").addEventListener("click", function (event) {
+      const button = event.target.closest("[data-phase]");
+      if (button) activatePhase(button.getAttribute("data-phase"), true);
+    });
+    document.getElementById("workflow-content").addEventListener("click", function (event) {
+      const button = event.target.closest("[data-phase-jump]");
+      if (button) activatePhase(button.getAttribute("data-phase-jump"), true);
+    });
+    document.getElementById("workflow-content").addEventListener("change", function (event) {
+      const input = event.target.closest("[data-review-phase]");
+      if (!input) return;
+      const id = input.getAttribute("data-review-phase");
+      state.reviewed = state.reviewed.filter(function (item) { return item !== id; });
+      if (input.checked) state.reviewed.push(id);
+      saveProgress();
+    });
+    document.getElementById("clear-progress-button").addEventListener("click", function () {
+      state.reviewed = [];
+      try { window.localStorage.removeItem(storageKey); state.storageOK = true; } catch (error) { state.storageOK = false; }
+      updateProgressUI();
+    });
+    document.querySelectorAll("[data-finding-mode]").forEach(function (button) {
+      button.addEventListener("click", function () { setFindingMode(button.getAttribute("data-finding-mode"), true); });
+    });
+    document.getElementById("glossary-search").addEventListener("input", function (event) {
+      const query = event.target.value.trim().toLowerCase();
+      document.querySelectorAll("[data-glossary-entry]").forEach(function (entry) { entry.hidden = query !== "" && entry.textContent.toLowerCase().indexOf(query) < 0; });
+    });
+    document.getElementById("packet-example-button").addEventListener("click", function () {
+      const output = document.getElementById("packet-output");
+      const packets = [{ timeMs: 0, bytes: 128 }, { timeMs: 40, bytes: 256 }, { timeMs: 95, bytes: 80 }];
+      const count = packets.length;
+      const totalBytes = packets.reduce(function (sum, packet) { return sum + packet.bytes; }, 0);
+      const startTime = Math.min.apply(null, packets.map(function (packet) { return packet.timeMs; }));
+      const endTime = Math.max.apply(null, packets.map(function (packet) { return packet.timeMs; }));
+      output.innerHTML = "<strong>One toy window summary</strong>packet_count: " + count + "<br>total_bytes: " + totalBytes + " bytes<br>duration: " + (endTime - startTime) + " ms";
+      output.classList.add("is-shown");
+    });
+    document.getElementById("group-example-button").addEventListener("click", function () {
+      const result = document.getElementById("group-split-result");
+      result.textContent = "Toy split: Cedar stays together on the training side; Birch stays together on the validation side. The names and assignment are illustrative.";
+    });
+    document.getElementById("quiz-form").addEventListener("submit", function (event) {
+      event.preventDefault();
+      let score = 0;
+      quiz.forEach(function (item, index) {
+        const chosen = document.querySelector('input[name="quiz-' + index + '"]:checked');
+        if (chosen && Number(chosen.value) === Number(item.correct)) score += 1;
+        const fieldset = document.querySelectorAll(".quiz-question")[index];
+        const feedback = fieldset && fieldset.querySelector(".quiz-feedback");
+        if (feedback) feedback.hidden = false;
+      });
+      setText("quiz-score", "Score: " + score + " / " + quiz.length);
+      const completion = document.getElementById("quiz-completion");
+      completion.textContent = "Your score is " + score + " out of " + quiz.length + ". Read each explanation, then revisit a workflow phase if you want another pass.";
+      completion.hidden = false;
+    });
+    document.getElementById("reset-quiz-button").addEventListener("click", function () {
+      document.getElementById("quiz-form").reset();
+      document.querySelectorAll(".quiz-feedback").forEach(function (feedback) { feedback.hidden = true; });
+      document.getElementById("quiz-completion").hidden = true;
+      setText("quiz-score", "");
+    });
+    // Native print, the Print all button, and PDF printing share the same complete view.
+    let printSnapshot = null;
+    function prepareForPrint() {
+      if (printSnapshot) return;
+      const detailNodes = Array.from(document.querySelectorAll("details"));
+      printSnapshot = {
+        details: detailNodes.map(function (node) { return [node, node.open]; }),
+        packetHTML: document.getElementById("packet-output").innerHTML,
+        packetClass: document.getElementById("packet-output").className,
+        groupText: document.getElementById("group-split-result").textContent
+      };
+      detailNodes.forEach(function (node) { node.open = true; });
+      document.getElementById("packet-example-button").click();
+      document.getElementById("group-example-button").click();
+    }
+    function restoreAfterPrint() {
+      if (!printSnapshot) return;
+      const saved = printSnapshot;
+      printSnapshot = null;
+      saved.details.forEach(function (item) { item[0].open = item[1]; });
+      document.getElementById("packet-output").innerHTML = saved.packetHTML;
+      document.getElementById("packet-output").className = saved.packetClass;
+      document.getElementById("group-split-result").textContent = saved.groupText;
+    }
+    window.addEventListener("beforeprint", prepareForPrint);
+    window.addEventListener("afterprint", restoreAfterPrint);
+    if (window.matchMedia) {
+      const printMedia = window.matchMedia("print");
+      const handlePrintMedia = function (event) { if (event.matches) prepareForPrint(); else restoreAfterPrint(); };
+      if (printMedia.addEventListener) printMedia.addEventListener("change", handlePrintMedia);
+      else if (printMedia.addListener) printMedia.addListener(handlePrintMedia);
+    }
+    document.getElementById("print-button").addEventListener("click", function () {
+      prepareForPrint();
+      try { window.print(); } catch (error) { restoreAfterPrint(); }
+    });
+    document.getElementById("download-button").addEventListener("click", function () {
+      const source = "<!doctype html>\n" + document.documentElement.outerHTML;
+      const blob = new Blob([source], { type: "text/html;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      const fileBase = slug((content.meta || {}).title || "cicids2017-reviewer");
+      anchor.href = url;
+      anchor.download = fileBase + ".html";
+      anchor.style.display = "none";
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      window.setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+    });
+    window.addEventListener("hashchange", readHash);
+  }());
+  </script>
+</body>
+</html>

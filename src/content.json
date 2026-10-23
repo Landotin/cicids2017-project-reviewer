@@ -1,0 +1,689 @@
+{
+  "meta": {
+    "title": "CICIDS2017 Project Reviewer",
+    "subtitle": "A plain-language guide to the data, saved model, evidence, and limits",
+    "reviewedDate": "2026-10-23"
+  },
+  "project": {
+    "headline": "Can a Random Forest recognize attack patterns in network traffic?",
+    "intro": "This project turns CICIDS2017 packet captures into 60-second conversation summaries, then trains Random Forest models to label each summary as normal traffic or an attack type. It reviews the saved measurements and explains where the evidence is small or incomplete.",
+    "goal": "We compare models using the same saved validation set and grouped cross-validation, choose one before scoring the reserved test, and explain its results and limits.",
+    "pitch": "The frozen T1 model scored 85.77% supported-class Macro F1 and 99.51% accuracy on 499,109 reserved test rows. It was not refitted for that test. The high overall scores do not mean every attack is reliably found: SQL Injection had only two test rows, and Bot, Infiltration, and XSS still have important errors.",
+    "gaps": [
+      {
+        "title": "High accuracy can hide weak uncommon-attack scores",
+        "observed": "The first weighted model B reached 99.36% validation accuracy but only 74.13% supported-class Macro F1. BENIGN rows dominate the total, so the accuracy number alone hides weaker attack-class results.",
+        "question": "How did we check whether the model also handled the less common attacks?",
+        "action": "We used supported-class Macro F1 as the main model-selection measure and reported per-class scores with each class's support.",
+        "learned": "Accuracy and Macro F1 answer different questions. Looking at class scores and support makes uncommon-class weaknesses easier to see."
+      },
+      {
+        "title": "Normal traffic was mistaken for attacks",
+        "observed": "On the fixed T1 test set, 2,218 of 417,513 BENIGN rows were labeled as attacks, a 0.53% false-alarm rate. The largest destinations were PortScan (1,567 rows) and Bot (509 rows).",
+        "question": "How often did normal traffic trigger an attack label, and which labels caused the alerts?",
+        "action": "We analyzed the saved validation and test errors by actual and predicted class, then reported BENIGN false-alarm counts and rates.",
+        "learned": "Most T1 test errors were normal rows flagged as attacks. Bot precision was 45.79%, even though Bot recall was 97.29%."
+      },
+      {
+        "title": "Related rows could make evaluation unfair",
+        "observed": "Many windows can come from the same conversation, and identical baseline patterns can appear in linked rows. If related rows land on both fitting and held-out sides, the score can look better than a genuinely separate check.",
+        "question": "How did we keep related windows together during model checks?",
+        "action": "We reused the saved grouped split and its three grouped cross-validation folds, keeping whole conversations and linked identical baseline patterns together.",
+        "learned": "Grouping reduces overlap between fitting and held-out rows. Large groups also mean the saved partitions are close to, but not exactly, 60/20/20."
+      },
+      {
+        "title": "More traffic measurements might help difficult classes",
+        "observed": "Our custom experiments used 15 baseline predictors and also tried four added values and fitted feature selection. A later, separate study tested a fuller set of official flow measurements.",
+        "question": "Did adding or selecting traffic measurements improve results?",
+        "action": "We tested four added predictors in model C, feature selectors in D and E, then ran a separate paired comparison of 15 official flow analogs and 77 official numeric inputs on the same saved folds.",
+        "learned": "The 77-input official arm averaged 81.98% Macro F1 versus 80.42% for 15 analogs, a 1.56-point difference. These are official flow rows, not T1's custom windows, so the result does not show that the 77 inputs beat T1."
+      },
+      {
+        "title": "Rare classes had too few independent examples",
+        "observed": "Heartbleed has 20 custom windows from one conversation, and the aligned official study retained nine Heartbleed flows from one group. Neither source can place independent Heartbleed examples in both fitting and held-out rows.",
+        "question": "Why keep Heartbleed in the study when its held-out score is N/A?",
+        "action": "We kept the Heartbleed examples on fitting sides, kept their groups intact, and reported zero held-out support with N/A scores.",
+        "learned": "N/A means there were no independent held-out examples to score; it is not a failed score of zero. The project does not claim reliable Heartbleed detection."
+      }
+    ],
+    "boundaries": [
+      "These results describe CICIDS2017 data, not live network traffic or a deployed alerting system.",
+      "The custom pipeline makes one row per 60-second conversation window. The official comparison uses different, flow-level records.",
+      "Three saved folds show observed variation; they do not establish statistical certainty or a guaranteed future ranking.",
+      "The final test was scored after the T1 choice was frozen. It was not used for another model search or refit.",
+      "The official-flow benchmark used a matched, filtered cohort. Its scores are not a direct comparison with custom T1.",
+      "This reviewer contains aggregate results and schemas, not raw packet rows, connection records, or IP addresses."
+    ]
+  },
+  "stages": [
+    {
+      "id": "pcap",
+      "title": "Packet captures",
+      "countLabel": "5 CICIDS2017 capture days",
+      "rowMeaning": "A PCAP is a binary recording of packets, not a table row.",
+      "explanation": "The project starts from the CICIDS2017 packet captures. Packets are decoded into tables so their fields and capture times can be processed.",
+      "detail": "The dataset covers five weekdays. A PCAP records packets; it is not yet a model row."
+    },
+    {
+      "id": "decoded44",
+      "title": "Decoded packet rows",
+      "countLabel": "44 columns · recorded historical schema",
+      "rowMeaning": "One row represents one decoded packet or frame.",
+      "explanation": "The historical decoder report records 44 columns here, with packet fields and capture/time information.",
+      "detail": "The 44-column count is the recorded historical schema. The 23 October review checked all five actual annotated files at 47 columns and all five prepared files at 19."
+    },
+    {
+      "id": "annotated47",
+      "title": "Packet rows with labels",
+      "countLabel": "47 columns",
+      "rowMeaning": "One row still represents one decoded packet or frame.",
+      "explanation": "Three label fields are added: label, label_status, and label_source. The 23 October review checked all five actual raw annotated CSV headers and found 47 columns in each.",
+      "detail": "The move from 44 to 47 columns adds annotation fields. It does not create the model's 15 predictors by dropping packet columns."
+    },
+    {
+      "id": "prepared19",
+      "title": "Prepared conversation windows",
+      "countLabel": "2,506,919 rows · 19 columns",
+      "rowMeaning": "One row summarizes a conversation during a 60-second window.",
+      "explanation": "This is where packet rows are grouped and the initial feature extraction happens. Each row has 15 numeric predictors and four metadata fields: conversation_id, capture_file, label, and label_status.",
+      "detail": "The 53,257 UNLABELED rows remain in the prepared files but are excluded from supervised fitting and scoring. Model C later adds four engineered ratios or indicators to make 19 model inputs. Frozen T1 uses the original 15 predictors."
+    },
+    {
+      "id": "split23",
+      "title": "Saved model partitions",
+      "countLabel": "2,453,662 labeled rows · 23 columns",
+      "rowMeaning": "One row is still a prepared conversation window, now with saved group and split information.",
+      "explanation": "Four fields are added to the 19 prepared columns: split_group, feature_hash, partition, and cv_fold. Related conversations and linked identical baseline patterns stay together.",
+      "detail": "The fixed split has 1,472,712 training rows, 481,841 validation rows, and 499,109 test rows. It also stores three grouped training folds. Heartbleed has 20 custom windows from one conversation, all on fitting sides; its held-out score is N/A."
+    }
+  ],
+  "workflow": [
+    {
+      "id": "problem",
+      "title": "Define the problem",
+      "plain": "Predict the traffic label for each prepared conversation window.",
+      "what": "The labels include normal traffic and 14 attack types. The project compares Random Forest settings and uses supported-class Macro F1 as its main selection measure.",
+      "why": "Accuracy alone can look strong when normal traffic is most of the data. A class-balanced measure helps show whether smaller attack classes are found.",
+      "input": "A labeled network-traffic classification task.",
+      "output": "A fixed question: how well can a model label these data rows, especially across the supported classes?",
+      "finding": "The prepared set has 15 labels in training; 14 have independent held-out support. Heartbleed does not.",
+      "spoken": "We classify each 60-second traffic summary, and we report class-level scores because normal traffic dominates the row count.",
+      "details": [
+        "This is a study of a named benchmark dataset, not a claim that the model is ready to monitor a live network.",
+        "A class with no held-out examples cannot receive a measured held-out score."
+      ]
+    },
+    {
+      "id": "gathering",
+      "title": "Gather the data",
+      "plain": "Start from CICIDS2017 captures, labels, and saved project files.",
+      "what": "CICIDS2017 provides five weekdays of packet captures and labeled traffic. The project also keeps prepared CSVs and a separate archive of official flow-level data for a later comparison.",
+      "why": "The source and label records explain what a row represents and where the labels came from.",
+      "input": "CICIDS2017 packet captures and label references; later, official flow CSVs for a separate study.",
+      "output": "Decoded packet tables and project records that can be checked before modeling.",
+      "finding": "CICIDS2017 provides packet captures and a separate set of official labeled flow files, which the project studies as a different data source.",
+      "spoken": "We use the named CICIDS2017 benchmark and keep the custom packet workflow separate from the official flow files.",
+      "details": [
+        "The 23 October review verified all five actual 47-column annotated headers.",
+        "The custom packet workflow and official flow archive are kept as separate sources with different row units."
+      ]
+    },
+    {
+      "id": "understanding",
+      "title": "Understand the rows",
+      "plain": "Check which records are packets, windows, or flows before counting them.",
+      "what": "A decoded packet row, a 60-second conversation-window row, and an official flow row are different units. The review also checks class counts and labels.",
+      "why": "Counts and scores are easy to misread if one row is assumed to mean the same thing at every stage.",
+      "input": "The decoded and annotated CSVs, prepared windows, saved split, and separate official-flow archive.",
+      "output": "A checked description of the units, columns, label support, and limits.",
+      "finding": "The prepared data has 2,506,919 rows: 2,453,662 with sourced labels and 53,257 marked UNLABELED.",
+      "spoken": "Before looking at model scores, we check what each row means and how many examples each class has.",
+      "details": [
+        "The five raw annotated CSV headers each have 47 columns; the five prepared CSV headers each have 19.",
+        "A score needs actual examples in the evaluated rows. Heartbleed has none in validation or test."
+      ]
+    },
+    {
+      "id": "preparation",
+      "title": "Prepare labels and saved fields",
+      "plain": "Keep sourced labels for supervised work and retain unlabeled rows outside it.",
+      "what": "The packet table gains label, label_status, and label_source. Prepared rows retain identity and label metadata; the saved partition adds group, feature hash, partition, and fold fields.",
+      "why": "Clear labels and group keys let the team fit only known examples and keep related rows together during evaluation.",
+      "input": "The 47-column annotated packet rows and saved preparation rules.",
+      "output": "Prepared 19-column windows plus saved 23-column partition rows.",
+      "finding": "The 53,257 UNLABELED rows stay in the prepared data but are outside supervised fitting and scoring.",
+      "spoken": "We do not treat an unknown label as a training target, and we keep identifiers for grouping and review rather than as predictors.",
+      "details": [
+        "The 19 prepared columns consist of 15 numeric predictors and four identity/label fields.",
+        "The saved partition adds split_group, feature_hash, partition, and cv_fold."
+      ]
+    },
+    {
+      "id": "extraction",
+      "title": "Extract window features",
+      "plain": "Summarize packets into 15 numbers for each 60-second conversation window.",
+      "what": "The initial feature extraction groups packet rows by conversation and time window, then calculates counts and statistics for protocol, duration, bytes, packet sizes, direction, and TCP flags.",
+      "why": "A fixed-size summary gives the model numerical descriptions of each window instead of one model row per packet.",
+      "input": "Packet rows, timestamps, direction and protocol fields, and the conversation grouping rules.",
+      "output": "One prepared window row with 15 baseline predictors plus four metadata fields.",
+      "finding": "The 15 predictors already exist before model training. Model C later adds four derived predictors; T1 stays with the original 15.",
+      "spoken": "Feature extraction is the packet-to-window step. T1 uses those 15 original summaries; C is the experiment that adds four more inputs.",
+      "details": [
+        "The 47 packet columns are not reduced to 15 by dropping columns or using PCA.",
+        "C's four added inputs are forward-to-backward packet ratio, forward-to-backward byte ratio, forward packet share, and a no-backward-packets indicator."
+      ]
+    },
+    {
+      "id": "splitting",
+      "title": "Split by related groups",
+      "plain": "Use the saved train, validation, test, and three-fold assignments.",
+      "what": "The split keeps whole conversations together and links identical baseline predictor patterns through split_group. The three grouped CV folds are saved with the data.",
+      "why": "If closely related records appear in both fitting and held-out rows, the model may be tested on examples that are too similar to what it saw.",
+      "input": "The 2,453,662 sourced-label rows and their conversation and feature-group keys.",
+      "output": "1,472,712 training rows, 481,841 validation rows, and 499,109 test rows in split_68ab64fbdd2b, plus three training folds.",
+      "finding": "Heartbleed's 20 custom windows come from one conversation and stay on fitting sides; its validation and test scores are N/A.",
+      "spoken": "We reuse the saved grouped split so related windows do not cross between fitting and held-out data.",
+      "details": [
+        "The row shares are about 60%, 20%, and 20%; group sizes mean the exact shares are not perfectly even.",
+        "A class present only on fitting sides cannot be evaluated independently."
+      ]
+    },
+    {
+      "id": "baseline-training",
+      "title": "Train the first model set",
+      "plain": "Compare five saved Random Forest designs named A through E.",
+      "what": "A and B use 15 baseline predictors; B adds balanced class weights. C uses 19 predictors after adding four ratios or indicators. D and E use fitted feature selectors.",
+      "why": "This first set checks whether class weighting, added summaries, or selecting fewer inputs changes supported-class scores.",
+      "input": "Training rows, 15 baseline predictors, and the saved A–E model settings.",
+      "output": "Validation and three-fold grouped-CV results for the historical model set.",
+      "finding": "C had the best mean CV Macro F1 among A–E at 66.10%; later eligible trials placed T1 ahead of C.",
+      "spoken": "The first comparison gave us a useful reference, but the final selection included later trials too.",
+      "details": [
+        "The original A–E forests used 80 trees, depth 12, leaf size 2, seed 42, and two CPU workers.",
+        "Selectors and class weights are fitted using fitting rows, not held-out test values."
+      ]
+    },
+    {
+      "id": "feature-settings",
+      "title": "Try settings and added inputs",
+      "plain": "Test four new weight or tree-setting choices, then check the shortlisted trials on all three folds.",
+      "what": "W1 changes the class-weight rule, T1 uses a deeper forest, T2 uses smaller leaves, and T3 combines a deeper forest with smaller leaves. Each uses the baseline 15 predictors.",
+      "why": "These trials ask whether different treatment of rare classes or tree detail helps on the saved data.",
+      "input": "Training and validation rows, the same baseline predictor definition, and fixed settings for each trial.",
+      "output": "Four validation results; T1 and T3 also receive all three saved grouped-CV fits.",
+      "finding": "T1 averaged 71.43% Macro F1 across the three folds with an 8.49-point sample SD. W1 and T2 CV was Not run because they were not shortlisted.",
+      "spoken": "We did not assume that a deeper tree or a weighting change would help; we checked the saved validation and fold results.",
+      "details": [
+        "T1 uses 80 trees, maximum depth 20, minimum leaf size 2, balanced weights, seed 42, and two CPU workers.",
+        "T1's mean CV Macro F1 led T3 by 0.1021 percentage points using full-precision values.",
+        "For every CV fit performed, balanced weights were recalculated from that fold's fitting labels only. W1 used square-root balanced weights for validation; its CV was Not run."
+      ]
+    },
+    {
+      "id": "selection-test",
+      "title": "Freeze T1, then score the test",
+      "plain": "Select by saved grouped-CV results before scoring the reserved test with the saved model.",
+      "what": "T1 ranked first among A–E, T1, and T3 by full-precision mean grouped-CV Macro F1. The choice was frozen on 21 October before the final test was scored.",
+      "why": "Keeping the test out of model choice gives a clearer final check on rows that did not guide the selected setting.",
+      "input": "The saved model fitted on 1,472,712 training rows, the frozen choice, and the reserved 499,109-row test set.",
+      "output": "85.77% supported-class Macro F1, 99.51% accuracy, and 2,218 benign false alarms among 417,513 benign rows.",
+      "finding": "The test Macro F1 is above the 71.43% CV mean, but the model was not refitted. CV averages three fold fits on different held-out rows; the final score comes from the frozen training-only fit on the reserved test. Against validation, the test score is 8.03 points higher, and two SQL rows contribute 7.14 points to that difference.",
+      "spoken": "The higher test score is a result on different rows, not an improvement caused by retraining. T1 was frozen before the test and scored without a refit.",
+      "details": [
+        "CV averages held-out scores from three fold fits. The final test scores the frozen training-only fit on a separate reserved partition, so the two estimates can differ.",
+        "SQL Injection changed from F1 zero on two validation rows to F1 100% on two test rows. That small support has a large effect because Macro F1 gives each supported class equal weight.",
+        "The test was used for reporting, not another parameter search, model choice, or refit."
+      ]
+    },
+    {
+      "id": "official-comparison",
+      "title": "Compare official flow inputs separately",
+      "plain": "Compare 15 flow-level analogs with 77 official numeric inputs on matched official-flow rows.",
+      "what": "The exploratory study reused the three grouped folds and fixed T1 forest settings. It compared two input sets on the same filtered, aligned official flow cohort.",
+      "why": "This asks whether the fuller official-flow representation helps within that study while holding rows, groups, and folds constant.",
+      "input": "1,126,067 eligible official flows in 536,179 groups, including nine Heartbleed rows that always fit; 1,126,058 rows receive held-out predictions.",
+      "output": "80.42% mean grouped-CV Macro F1 for 15 flow analogs and 81.98% for 77 official inputs, a paired mean difference of 1.56 points.",
+      "finding": "The 77-input set scored higher on each of the three saved folds, but three folds do not establish statistical certainty. The flow analogs do not reproduce T1's custom 60-second window inputs.",
+      "spoken": "The result supports the fuller official input set within this filtered paired comparison; it does not show that it beats custom T1.",
+      "details": [
+        "The official archive has 85 column positions; seven tracing or label fields and one identical duplicate leave 77 numeric inputs.",
+        "The 15 analogs approximate baseline concepts at the official flow level. They are not T1's actual 15 custom window inputs.",
+        "The nine official Heartbleed flow rows are different from the 20 custom Heartbleed window rows; both sets stay on fitting sides.",
+        "In each fold, the official median imputer and class weights are fit on that fold's fitting rows only.",
+        "Infiltration and SQL Injection both had zero F1 in this study; Heartbleed had no held-out support and is N/A."
+      ]
+    },
+    {
+      "id": "interpretation-reporting",
+      "title": "Interpret and report the limits",
+      "plain": "Pair overall metrics with per-class support, false alarms, and what the study cannot establish.",
+      "what": "The report explains accuracy, Macro F1, precision, recall, false alarms, fold variation, rare-class support, data provenance, and the different official-flow study.",
+      "why": "A single high score can hide weak detection on rare attacks, and different row units or cohorts cannot be treated as a direct ranking.",
+      "input": "Reviewed aggregate tables, schema checks, saved model results, and source documentation.",
+      "output": "A bounded conclusion: strong results on many larger classes, with remaining errors and limited evidence for rare classes.",
+      "finding": "T1's Bot precision was 45.79%, Infiltration F1 was 47.62% on 13 rows, XSS F1 was 36.00% on 18, and Heartbleed was N/A.",
+      "spoken": "We report what the saved measurements show and keep small support, fold variation, and source gaps beside the headline scores.",
+      "details": [
+        "Accuracy counts correct rows and can be driven by the large BENIGN class.",
+        "A supported class the model completely misses has F1 zero; a class with no held-out examples has score N/A.",
+        "The official benchmark uses a filtered cohort and a different row unit, so its scores do not rank directly against T1's custom test.",
+        "The original Wednesday and Thursday conversion logs were not recovered. On 23 October, their connection metadata was reconstructed from saved raw CSVs and checked against prepared outputs; this is new evidence, not the original logs."
+      ]
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Accuracy",
+      "plain": "The share of all evaluated rows the model labels correctly.",
+      "detail": "It can be high when the largest class is predicted well, even if some smaller attacks are missed."
+    },
+    {
+      "term": "Precision",
+      "plain": "Among rows predicted as a class, the share that truly belongs to that class.",
+      "detail": "Low Bot precision means many rows labeled Bot were not actually Bot."
+    },
+    {
+      "term": "Recall",
+      "plain": "Among the actual rows in a class, the share the model finds.",
+      "detail": "High Bot recall means most actual Bot rows were found; it does not say how many normal rows were also labeled Bot."
+    },
+    {
+      "term": "F1",
+      "plain": "A score that combines precision and recall for one class.",
+      "detail": "It is low when either precision or recall is low, and it is zero when a supported class has no correct predictions."
+    },
+    {
+      "term": "Macro F1",
+      "plain": "The average of class F1 scores, giving each supported class equal weight.",
+      "detail": "The project averages the 14 classes with held-out examples. A class with zero held-out support is excluded and reported as N/A."
+    },
+    {
+      "term": "False alarm",
+      "plain": "A normal BENIGN row predicted as an attack.",
+      "detail": "The false-alarm rate divides these rows by the actual BENIGN rows. T1 flagged 2,218 of 417,513 test BENIGN rows."
+    },
+    {
+      "term": "Fold",
+      "plain": "One round of CV: part of the data is held out while the rest is used to fit the model.",
+      "detail": "CV means cross-validation. This project uses three saved grouped folds of training data, and each fold keeps related rows together."
+    },
+    {
+      "term": "Variation / SD",
+      "plain": "Standard deviation describes how far fold scores spread around their average.",
+      "detail": "The project reports sample SD in percentage points. It describes the three observed folds; it is not a confidence interval."
+    },
+    {
+      "term": "Class weights",
+      "plain": "Training settings that give more influence to examples from less common classes.",
+      "detail": "Weights do not add examples or guarantee better rare-class detection. They are calculated from fitting rows."
+    },
+    {
+      "term": "Feature",
+      "plain": "A measured value that describes traffic, such as packet count or byte total.",
+      "detail": "The initial custom extraction makes 15 numeric features for each 60-second conversation window."
+    },
+    {
+      "term": "Predictor",
+      "plain": "A feature supplied to a model as an input for making a prediction.",
+      "detail": "T1 takes 15 baseline predictors. Model C adds four derived predictors and therefore uses 19."
+    },
+    {
+      "term": "Support",
+      "plain": "The number of actual examples of a class in the evaluated rows.",
+      "detail": "A score from two rows is much less informative about future performance than a score from many independent examples."
+    },
+    {
+      "term": "T1",
+      "plain": "Trial 1: the name of the selected and frozen custom Random Forest model.",
+      "detail": "T1 uses 80 trees, depth 20, minimum leaf size 2, balanced class weights, and the original 15 predictors. It was fitted on training rows only."
+    },
+    {
+      "term": "Conversation",
+      "plain": "Packets linked as one two-way exchange for the project's summaries.",
+      "detail": "The project uses conversation identity to make time-window rows and keep related rows together during splitting."
+    },
+    {
+      "term": "Window",
+      "plain": "A 60-second time slice used to summarize a conversation.",
+      "detail": "One prepared row represents one conversation during a window, rather than one packet."
+    },
+    {
+      "term": "Flow",
+      "plain": "A connection summary row produced by the official CICFlowMeter data.",
+      "detail": "An official flow row has a different boundary and meaning from one custom 60-second conversation window."
+    },
+    {
+      "term": "Leakage",
+      "plain": "When information from held-out examples helps fit or choose a model.",
+      "detail": "Keeping related groups together and fitting learned settings on fitting rows helps prevent leakage."
+    },
+    {
+      "term": "Hyperparameter",
+      "plain": "A model setting chosen before fitting, such as tree depth or leaf size.",
+      "detail": "T1's maximum depth is 20 and its minimum leaf size is 2."
+    },
+    {
+      "term": "Validation",
+      "plain": "A held-out set used to compare or inspect model choices during development.",
+      "detail": "Validation is separate from the final reserved test. The final test is for reporting after the choice is frozen."
+    },
+    {
+      "term": "Test",
+      "plain": "The reserved held-out rows used for the final evaluation.",
+      "detail": "T1 was frozen before the 499,109 test rows were scored; the result was not used for another search or refit."
+    },
+    {
+      "term": "N/A",
+      "plain": "A score is not available because there are no examples of that class in the evaluated rows.",
+      "detail": "Heartbleed has zero validation and test support, so its held-out precision, recall, and F1 are N/A."
+    },
+    {
+      "term": "Not run",
+      "plain": "The planned calculation was not performed.",
+      "detail": "W1 and T2 have validation results, but their three-fold CV was Not run because they were not shortlisted."
+    },
+    {
+      "term": "Zero",
+      "plain": "A measured score of 0 when the class has evaluated examples but no correct hits.",
+      "detail": "For example, official-flow Infiltration had 25 held-out flows and F1 zero. That is different from N/A, which has no held-out examples."
+    }
+  ],
+  "practice": [
+    {
+      "question": "What is this project trying to predict?",
+      "answer": "It predicts the label of each 60-second conversation-window summary as BENIGN or one of 14 attack types.",
+      "say": "We classify traffic summaries from CICIDS2017 and check performance by class, not just by total accuracy."
+    },
+    {
+      "question": "What does one prepared row represent?",
+      "answer": "One row summarizes a conversation during a 60-second window; it is not one packet or one official flow.",
+      "say": "Our model row is a window summary, which is why packet, prepared-window, and official-flow counts differ."
+    },
+    {
+      "question": "Why do the prepared file and T1 have different feature counts?",
+      "answer": "The 19 prepared columns are 15 numeric predictors plus four metadata fields. T1 uses the 15 predictors; Model C adds four engineered inputs and uses 19 predictors.",
+      "say": "The initial packet-to-window extraction already made the 15 features. C adds four more, but T1 stays at 15."
+    },
+    {
+      "question": "Why are UNLABELED rows not used for supervised training?",
+      "answer": "They have no sourced target label for the model to learn or for the evaluation to check. The 53,257 rows remain in prepared data but are excluded from supervised fitting and scoring.",
+      "say": "We keep the rows for the data record, but we do not pretend an unknown label is a known answer."
+    },
+    {
+      "question": "How does the split reduce the risk of testing on familiar examples?",
+      "answer": "It keeps whole conversations and linked identical baseline patterns together, then reuses the saved train, validation, test, and three grouped folds.",
+      "say": "Related windows stay on one side of the split so a near-copy is less likely to appear in both fitting and held-out rows."
+    },
+    {
+      "question": "Why report Macro F1 and accuracy together?",
+      "answer": "Accuracy counts correct rows and can be dominated by common BENIGN traffic. Macro F1 averages the F1 of supported classes equally, so it makes rare-class misses more visible.",
+      "say": "Accuracy tells us how many rows were right overall; Macro F1 gives each supported class a voice."
+    },
+    {
+      "question": "What does T1 mean, and how was it chosen?",
+      "answer": "T1 means Trial 1, the name of one tested Random Forest setting. It ranked first among eligible models by full-precision mean Macro F1 across the three saved grouped cross-validation folds: 71.43%. Its lead over T3 was only 0.1021 percentage points.",
+      "say": "We called it Trial 1. It had the highest saved-fold average, so we froze it before the test; three folds do not prove its small lead over T3 will persist."
+    },
+    {
+      "question": "Why is the test Macro F1 higher than the CV mean?",
+      "answer": "They use different held-out rows and fitting conditions. The frozen training-only model was scored on the reserved test without refitting; two SQL test examples contribute strongly to the difference. A higher test result is not evidence of improvement from retraining.",
+      "say": "The model did not learn between those scores. The test rows gave a different result, especially because two SQL examples changed the class average."
+    },
+    {
+      "question": "Does 99.51% test accuracy mean every attack is reliably detected?",
+      "answer": "No. Test support is small for several attacks; for example, Infiltration has 13 rows, XSS has 18, and SQL Injection has two. Bot precision is 45.79%, and Heartbleed has no held-out support.",
+      "say": "High accuracy is encouraging for many rows, but it does not prove reliable detection of every attack type."
+    },
+    {
+      "question": "What does T1's false-alarm rate mean?",
+      "answer": "It is the number of actual BENIGN rows labeled as attacks divided by all actual BENIGN rows. T1 flagged 2,218 of 417,513 BENIGN test rows, or 0.53%.",
+      "say": "A false alarm here means normal traffic was called an attack. We report its rate among normal rows."
+    },
+    {
+      "question": "Where did the 77 measurements come from, and what did the comparison show?",
+      "answer": "They came from the official CICFlowMeter flow CSVs: 85 column positions minus seven tracing or label fields and one duplicate left 77 numeric inputs. On the same filtered rows and three folds, they averaged 81.98% Macro F1 versus 80.42% for 15 flow-level analogs, a 1.56-point difference. These are different rows and inputs from T1.",
+      "say": "The 77 measurements are from the official flow files. They scored higher than 15 official flow analogs in that paired study, but this does not show that they beat custom T1."
+    },
+    {
+      "question": "Why keep Heartbleed in the study if its held-out score is N/A?",
+      "answer": "Its 20 custom windows come from one conversation, so they stay together on fitting sides instead of being split to create a misleading test. The official study's nine Heartbleed flows also stay on fitting sides. We report the held-out score as N/A because there are no independent held-out examples.",
+      "say": "We keep the examples for fitting, but we cannot score Heartbleed on unseen conversations here. N/A means no held-out examples, not a score of zero."
+    }
+  ],
+  "quiz": [
+    {
+      "question": "How many numeric predictors does the frozen T1 model use?",
+      "options": [
+        "4",
+        "15",
+        "19",
+        "47"
+      ],
+      "correct": 1,
+      "explanation": "T1 uses the original 15 baseline predictors. The prepared file has 19 columns because four are metadata; Model C adds four predictors and uses 19."
+    },
+    {
+      "question": "How many prepared rows have sourced labels for supervised work?",
+      "options": [
+        "53,257",
+        "499,109",
+        "2,506,919",
+        "2,453,662"
+      ],
+      "correct": 3,
+      "explanation": "There are 2,453,662 rows with sourced labels. The other 53,257 are UNLABELED and remain outside supervised fitting and scoring."
+    },
+    {
+      "question": "Heartbleed's test score is N/A because…",
+      "options": [
+        "there are no Heartbleed rows in the held-out test",
+        "its score was exactly zero",
+        "the test was not run",
+        "it was removed from the dataset"
+      ],
+      "correct": 0,
+      "explanation": "Heartbleed has 20 custom windows from one conversation, all kept on fitting sides. With no held-out examples, its test score is not available."
+    },
+    {
+      "question": "Why keep related conversations and linked patterns in one split group?",
+      "options": [
+        "to make every partition exactly 20%",
+        "to remove all BENIGN rows",
+        "to reduce the chance that near-related rows appear on both fitting and held-out sides",
+        "to increase the number of attack labels"
+      ],
+      "correct": 2,
+      "explanation": "Keeping related rows together helps avoid evaluating on data that is too similar to rows used for fitting. Group sizes also mean exact target shares are not guaranteed."
+    },
+    {
+      "question": "What does Macro F1 do?",
+      "options": [
+        "count every correct row and divide by all rows",
+        "average class F1 scores equally for classes with held-out support",
+        "measure only BENIGN false alarms",
+        "average the model's training time"
+      ],
+      "correct": 1,
+      "explanation": "Macro F1 gives each supported class equal weight in the average, unlike accuracy, which counts individual rows."
+    },
+    {
+      "question": "Which statement about T1's final test is correct?",
+      "options": [
+        "It was refitted on training plus validation before scoring",
+        "It was chosen after comparing test results",
+        "It scored exactly the same as its CV mean",
+        "It scored 85.77% supported-class Macro F1 and 99.51% accuracy without a refit"
+      ],
+      "correct": 3,
+      "explanation": "T1 was frozen before the test and the saved training-only model was used without refitting. Its test Macro F1 was 85.77% and accuracy was 99.51%."
+    },
+    {
+      "question": "What was compared in the separate official-flow study?",
+      "options": [
+        "77 official inputs against 15 flow analogs on the same filtered rows and folds",
+        "T1's 15 custom predictors against 77 features on the final test",
+        "two new test sets after retraining T1",
+        "packet rows against unlabeled rows"
+      ],
+      "correct": 0,
+      "explanation": "The matched official-flow study compared a 77-input representation with 15 flow-level analogs on the same filtered cohort. The 15 analogs are not T1's custom window inputs."
+    },
+    {
+      "question": "What can be concluded from only three grouped CV folds?",
+      "options": [
+        "the ranking is statistically certain",
+        "all rare attacks will be detected in future",
+        "the observed fold results and their spread can be reported, but they do not establish statistical certainty",
+        "the final test should be used for another model search"
+      ],
+      "correct": 2,
+      "explanation": "Three folds provide a useful observed comparison, not statistical certainty. The reserved test must remain separate from another model search."
+    }
+  ],
+  "sources": [
+    {
+      "title": "Official CICIDS2017 dataset page",
+      "url": "https://www.unb.ca/cic/datasets/ids-2017.html",
+      "access": "public",
+      "why": "Describes the five-day dataset, packet captures, labeled flow files, and attack types."
+    },
+    {
+      "title": "Project reviewer home",
+      "url": "https://landotin.github.io/cicids2017-project-reviewer/",
+      "access": "public",
+      "why": "The self-contained reviewer presents the workflow and conclusions in plain language."
+    },
+    {
+      "title": "Schema checks",
+      "url": "https://landotin.github.io/cicids2017-project-reviewer/evidence/schema_checks.csv",
+      "access": "public",
+      "why": "Aggregate checks for all five 47-column annotated packet files and five 19-column prepared files."
+    },
+    {
+      "title": "Partition summary",
+      "url": "https://landotin.github.io/cicids2017-project-reviewer/evidence/partition_summary.csv",
+      "access": "public",
+      "why": "Saved train, validation, and test row counts and shares."
+    },
+    {
+      "title": "Class support by partition",
+      "url": "https://landotin.github.io/cicids2017-project-reviewer/evidence/class_support.csv",
+      "access": "public",
+      "why": "Shows how many examples of each class are in training, validation, and test."
+    },
+    {
+      "title": "Custom model validation results",
+      "url": "https://landotin.github.io/cicids2017-project-reviewer/evidence/custom_validation.csv",
+      "access": "public",
+      "why": "Aggregate validation measurements for the custom model candidates."
+    },
+    {
+      "title": "First-version validation results",
+      "url": "https://landotin.github.io/cicids2017-project-reviewer/evidence/v1_validation.csv",
+      "access": "public",
+      "why": "Aggregate validation scores for the original A–E model candidates."
+    },
+    {
+      "title": "First-version grouped CV results",
+      "url": "https://landotin.github.io/cicids2017-project-reviewer/evidence/v1_cv.csv",
+      "access": "public",
+      "why": "Mean and variation of the original A–E scores across three grouped folds."
+    },
+    {
+      "title": "Custom grouped CV fold results",
+      "url": "https://landotin.github.io/cicids2017-project-reviewer/evidence/custom_cv_folds.csv",
+      "access": "public",
+      "why": "Shows T1 and T3 scores on each of the three saved grouped folds."
+    },
+    {
+      "title": "Custom model ranking",
+      "url": "https://landotin.github.io/cicids2017-project-reviewer/evidence/custom_ranking.csv",
+      "access": "public",
+      "why": "Records the eligible custom models ranked by grouped CV and the selection measurements."
+    },
+    {
+      "title": "Final test metrics",
+      "url": "https://landotin.github.io/cicids2017-project-reviewer/evidence/final_test_metrics.csv",
+      "access": "public",
+      "why": "Aggregate T1 test metrics, including supported-class Macro F1, accuracy, and BENIGN false alarms."
+    },
+    {
+      "title": "Final test per-class results",
+      "url": "https://landotin.github.io/cicids2017-project-reviewer/evidence/final_test_per_class.csv",
+      "access": "public",
+      "why": "Per-class precision, recall, F1, and test support for the frozen T1 model."
+    },
+    {
+      "title": "Official-flow summary results",
+      "url": "https://landotin.github.io/cicids2017-project-reviewer/evidence/official_summary.csv",
+      "access": "public",
+      "why": "Aggregate measurements for the 15 flow analog and 77 official-input arms."
+    },
+    {
+      "title": "Official-flow fold results",
+      "url": "https://landotin.github.io/cicids2017-project-reviewer/evidence/official_folds.csv",
+      "access": "public",
+      "why": "Shows each official feature arm's scores and held-out row counts in all three folds."
+    },
+    {
+      "title": "Official-flow paired fold differences",
+      "url": "https://landotin.github.io/cicids2017-project-reviewer/evidence/official_paired_folds.csv",
+      "access": "public",
+      "why": "Shows the 77-input minus 15-analog Macro F1 difference on each matched fold."
+    },
+    {
+      "title": "Official-flow per-class results",
+      "url": "https://landotin.github.io/cicids2017-project-reviewer/evidence/official_class_f1.csv",
+      "access": "public",
+      "why": "Pairs official-flow class scores with held-out support."
+    },
+    {
+      "title": "Evidence provenance record",
+      "url": "https://landotin.github.io/cicids2017-project-reviewer/evidence/provenance.json",
+      "access": "public",
+      "why": "Lists the aggregate evidence files, source paths, review date, and scope."
+    },
+    {
+      "title": "Original project repository",
+      "url": "https://github.com/xtian413/CICIDS2017-Attack-Classification",
+      "access": "project",
+      "why": "Contains the project's original reports, data pipeline description, and saved-result documentation."
+    },
+    {
+      "title": "Original model development report",
+      "url": "https://github.com/xtian413/CICIDS2017-Attack-Classification/blob/5170ec1458c05dd8fe230cccb157a52af47fb1b4/docs/MODEL_DEVELOPMENT_REPORT.md",
+      "access": "project",
+      "why": "The full model timeline, experiments, model selection, and final result; project access may be required."
+    },
+    {
+      "title": "Original data pipeline report",
+      "url": "https://github.com/xtian413/CICIDS2017-Attack-Classification/blob/5170ec1458c05dd8fe230cccb157a52af47fb1b4/docs/DATA_PIPELINE.md",
+      "access": "project",
+      "why": "The saved row, column, feature, label, and split definitions; project access may be required."
+    },
+    {
+      "title": "Original final test analysis",
+      "url": "https://github.com/xtian413/CICIDS2017-Attack-Classification/blob/5170ec1458c05dd8fe230cccb157a52af47fb1b4/docs/FINAL_TEST_ANALYSIS.md",
+      "access": "project",
+      "why": "The final T1 test scores, class support, false alarms, and interpretation limits; project access may be required."
+    },
+    {
+      "title": "Original official-flow results report",
+      "url": "https://github.com/xtian413/CICIDS2017-Attack-Classification/blob/5170ec1458c05dd8fe230cccb157a52af47fb1b4/docs/OFFICIAL_FEATURE_RESULTS.md",
+      "access": "project",
+      "why": "The separate filtered official-flow comparison and its limits; project access may be required."
+    },
+    {
+      "title": "Model development Google Doc",
+      "url": "https://docs.google.com/document/d/1V5azZkm9MXk1F7bi0tgn-7g3P91gt8YKZ8TyjTF1kp4/edit",
+      "access": "project",
+      "why": "The maintained project report with model decisions, final results, and review limits; project access may be required."
+    },
+    {
+      "title": "Notebook 05: official-flow feature comparison",
+      "url": "https://colab.research.google.com/drive/1boNZOlTeAckcKQHqhOzQReeSyWgTIZsK",
+      "access": "project",
+      "why": "The completed notebook for the separate official-flow comparison; project access may be required."
+    }
+  ]
+}

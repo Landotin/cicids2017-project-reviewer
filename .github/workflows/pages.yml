@@ -1,0 +1,56 @@
+name: Check and publish reviewer
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - index.html
+      - src/**
+      - scripts/**
+      - evidence/**
+      - .github/workflows/pages.yml
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: reviewer-pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify reviewed evidence and generated HTML
+        run: python scripts/build.py --check
+      - name: Prepare public site
+        run: |
+          mkdir -p site/evidence
+          cp index.html site/index.html
+          cp index.html site/CICIDS2017-Project-Reviewer.html
+          cp evidence/* site/evidence/
+          touch site/.nojekyll
+      - uses: actions/upload-pages-artifact@v4
+        if: github.event_name != 'pull_request'
+        with:
+          path: site
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: check
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
