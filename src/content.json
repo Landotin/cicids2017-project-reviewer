@@ -191,14 +191,15 @@
     {
       "id": "baseline-training",
       "title": "Train the first model set",
-      "plain": "Compare five saved Random Forest designs named A through E.",
-      "what": "A and B use 15 baseline predictors; B adds balanced class weights. C uses 19 predictors after adding four ratios or indicators. D and E use fitted feature selectors.",
+      "plain": "Training means learning how traffic measurements relate to known labels.",
+      "what": "We trained Random Forest models, each combining 80 decision trees. A tree learns a series of questions about measurements, such as packet counts. The forest combines the trees’ estimates to choose a traffic label. We compared five saved designs named A through E.",
       "why": "This first set checks whether class weighting, added summaries, or selecting fewer inputs changes supported-class scores.",
       "input": "Training rows, 15 baseline predictors, and the saved A–E model settings.",
       "output": "Validation and three-fold grouped-CV results for the historical model set.",
       "finding": "C had the best mean CV Macro F1 among A–E at 66.10%; later eligible trials placed T1 ahead of C.",
       "spoken": "The first comparison gave us a useful reference, but the final selection included later trials too.",
       "details": [
+        "A and B use 15 baseline predictors; B adds balanced class weights. C uses 19 predictors after adding four values. D selects 8 from the original 15, and E selects 12 from the expanded 19.",
         "The original A–E forests used 80 trees, depth 12, leaf size 2, seed 42, and two CPU workers.",
         "Selectors and class weights are fitted using fitting rows, not held-out test values."
       ]
@@ -272,6 +273,21 @@
     }
   ],
   "glossary": [
+    {
+      "term": "Training",
+      "plain": "Learning a rule from examples with known answers.",
+      "detail": "We give the model traffic measurements and their known labels. It learns patterns from fitting rows; held-out rows check those patterns."
+    },
+    {
+      "term": "Decision tree",
+      "plain": "A series of learned questions that leads to a predicted label.",
+      "detail": "For example, a tree can split examples using packet counts or duration. Its questions are learned from the fitting data."
+    },
+    {
+      "term": "Random Forest",
+      "plain": "A model that combines many decision trees.",
+      "detail": "Our forests have 80 trees. They combine the trees’ class estimates to choose a traffic label; we do not rely on a single tree."
+    },
     {
       "term": "Accuracy",
       "plain": "The share of all evaluated rows the model labels correctly.",

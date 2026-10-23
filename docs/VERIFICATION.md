@@ -4,7 +4,7 @@
 
 - Two Luna Max implementation workers handled content and interface separately. A third independently reviewed the new content and display facts. The supervisor reviewed and integrated their work.
 - All fourteen copied aggregate tables match their recorded SHA-256 hashes. Display numbers are generated from these tables; scores remain unrounded fractions until formatting.
-- Required counts passed: five data stages, eleven lifecycle phases, five project gap cards, twelve oral-practice cards, eight four-option quiz questions, and twenty-three glossary terms.
+- Required counts passed: five data stages, eleven lifecycle phases, five project gap cards, twelve oral-practice cards, eight four-option quiz questions, and twenty-six glossary terms.
 - Dataset counts, saved partitions, final-test supports, supported-class Macro F1, ranking, official paired differences, and N/A/Not run distinctions passed build checks.
 - Source scope is preserved: custom-window T1 and official-flow comparison are separate experiments. The original data, split, models, and test outcome were not changed.
 
