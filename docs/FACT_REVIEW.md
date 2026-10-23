@@ -18,6 +18,8 @@ Evidence checked: `evidence/schema_checks.csv`, `evidence/partition_summary.csv`
 
 After the independent review, the supervisor clarified selection using validation and grouped CV before final testing, distinguished zero Heartbleed support from N/A scores, and corrected the feature-experiment chronology. Display facts gained the already verified 991,134 custom linked-group count. No measured score changed.
 
-Final content SHA-256: `41b2f920c3913b57fcb1bf758f5143499bb0abb2db46f7d3c34e20e41dad66f3`.
+Final content SHA-256: `0c4b3bcd6979431cd42d09a6f1f09983032de339d280af1d04f85656e235a386`.
 
 Final facts SHA-256: `6859f3320b8367ea5d79a3ea2e324748cbd984f0393a87ecabdc9bdf4ab764ad`.
+
+The supervisor also added plain-English definitions of training, a decision tree, and Random Forest, and explained the model before the A–E settings. The completed reviewer has 26 glossary entries. These teaching changes preserve every measurement and evaluation decision.

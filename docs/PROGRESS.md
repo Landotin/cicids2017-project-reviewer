@@ -8,7 +8,10 @@
 - Complete: plain-English content and interface by separate Luna Max workers; independent content review and supervisor integration.
 - Complete: 40 interaction checks, five automated accessibility views with zero violations, four responsive widths, keyboard navigation, offline download, and complete print content. See [verification](VERIFICATION.md).
 - Configured: the dedicated public repository and GitHub Pages using Actions.
-- Pending: initial deployment and live-link verification.
+- Complete: GitHub Pages deployment and live-link verification. The home page, downloadable HTML, and fourteen aggregate evidence tables returned HTTP200 and matched the committed hashes. The latest teaching update was also checked on the live page.
+- Live reviewer: https://landotin.github.io/cicids2017-project-reviewer/
+- Passing deployment: https://github.com/Landotin/cicids2017-project-reviewer/actions/runs/39973255564
+- This artifact is complete. It supports project review and practice; the separate slide-deck task remains outside this deliverable.
 
 ## Content decisions
 
