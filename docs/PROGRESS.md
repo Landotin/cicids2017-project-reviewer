@@ -32,3 +32,4 @@
 - Checked whole-frame bytes, first-retained-packet direction, window duration, flag counts, and zero-denominator handling against the implementation. Relevance explanations are explicitly not measured importance rankings.
 - Preserved T1's fifteen inputs, all measured results, and the separate origin and scope of the official 77-input comparison.
 - Focused browser checks covered filters, feature-set controls, workflow links, phone/desktop layout, accessibility, deep linking, and all nineteen printed feature definitions. See [verification](VERIFICATION.md).
+- Published and verified: [successful Pages run](https://github.com/Landotin/cicids2017-project-reviewer/actions/runs/40200553411). Both live HTML files match the built file; the live feature deep link displays all nineteen definitions.
