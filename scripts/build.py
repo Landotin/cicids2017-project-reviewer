@@ -120,6 +120,17 @@ def validate(content, facts, template):
         assert len(q['options']) == 4 and 0 <= q['correct'] <= 3 and q['explanation']
     assert len(content['stages']) == 5 and len(content['project']['gaps']) == 5
     assert len(content['glossary']) >= 20
+    guide = content['featureGuide']
+    assert len(guide['baseline']) == 15
+    assert {r['key'] for r in guide['baseline']} == set(facts['dataset']['baselineFeatures'])
+    assert len(guide['engineered']) == 4
+    assert {r['key'] for r in guide['engineered']} == {'forward_backward_packet_ratio', 'forward_backward_byte_ratio', 'forward_packet_share', 'no_backward_packets'}
+    assert len(guide['where']) == 3
+    for row in guide['baseline'] + guide['engineered']:
+        assert all(row.get(k) for k in ('key', 'title', 'group', 'meaning', 'why'))
+    for row in guide['where']:
+        assert row['link'].startswith('#workflow/')
+        assert row['link'].split('/')[-1] in {p['id'] for p in content['workflow']}
     for phase in content['workflow']:
         assert all(phase.get(k) for k in ('id', 'title', 'plain', 'what', 'why', 'input', 'output', 'finding', 'spoken'))
     assert sum(p['rows'] for p in facts['split']['parts']) == facts['dataset']['labeledRows']

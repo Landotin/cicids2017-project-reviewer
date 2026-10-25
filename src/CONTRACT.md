@@ -14,6 +14,7 @@ Build a self-contained static reviewer, simple English, with four top-level tabs
 - practice: exactly 12 [{question, answer, say}].
 - quiz: exactly 8 [{question, options:[string,string,string,string], correct:integer 0..3, explanation}].
 - sources: [{title, url, access, why}], access is public or project. Link public dataset/reviewer aggregate tables plus member-access original reports/Doc/notebook. Explicitly label private/project evidence links.
+- featureGuide: {intro, where:[{title,stage,what,link}], baseline:[{key,title,group,meaning,why}], engineered:[{key,title,group,meaning,why,formula}], note, official}. The baseline lists all 15 fixed predictors; the engineered list describes C's four derived values. The guide distinguishes extraction (Step5), C engineering before A–E fits (Step7), and settings tuning without new inputs (Step8). It also explains the separate official analog calculations in Step10. Relevance descriptions explain possible use, not measured importance.
 
 ## facts.json (supervisor owns)
 

@@ -11,6 +11,8 @@ A plain-English, interactive guide to our network-attack classification project.
 3. Open **Findings and Meaning**. Its custom-window and official-flow views are separate experiments.
 4. Use the twelve answer cards and eight quiz questions in **Practice Explaining**.
 
+Open **[What did we extract and engineer?](https://landotin.github.io/cicids2017-project-reviewer/#project/features)** for the exact workflow stages and a plain-language guide to all 15 original predictors and Model C's four extra values. Filter by traffic type/time, amount/size, direction, or connection signs. Each entry explains what the feature measures and why it may help; these explanations are not measured feature-importance rankings.
+
 Use **Download HTML** to save one file that opens in a browser without internet. Evidence links need internet; the explanations, results, diagrams, and practice tools are embedded in the file. Use **Print all** for a paper or PDF study copy. Any learning progress is stored only in your browser and is optional.
 
 ## What the scores describe

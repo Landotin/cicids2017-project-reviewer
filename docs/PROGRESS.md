@@ -23,3 +23,12 @@
 - The official comparison retained 1,126,067 rows; nine Heartbleed flow rows always fit, and 1,126,058 other rows received held-out predictions per feature set.
 - Unsupported scores remain N/A; unperformed CV is Not run; measured zero F1 remains zero.
 - The reviewer introduces no new fit, data split, or test prediction.
+
+## 25 October 2026 — feature explanations
+
+- Added a feature guide in the Project tab, linked from Findings: [open the guide](https://landotin.github.io/cicids2017-project-reviewer/#project/features).
+- Distinguished initial packet-to-window extraction in Step 5, Model C engineering and D/E selection in Step 7, and settings-only trials in Step 8.
+- Added plain-language meanings and potential relevance for the fifteen original predictors and four C extras, with filters and optional formulas.
+- Checked whole-frame bytes, first-retained-packet direction, window duration, flag counts, and zero-denominator handling against the implementation. Relevance explanations are explicitly not measured importance rankings.
+- Preserved T1's fifteen inputs, all measured results, and the separate origin and scope of the official 77-input comparison.
+- Focused browser checks covered filters, feature-set controls, workflow links, phone/desktop layout, accessibility, deep linking, and all nineteen printed feature definitions. See [verification](VERIFICATION.md).

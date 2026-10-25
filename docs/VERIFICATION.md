@@ -29,3 +29,11 @@ Evidence links require internet; original project reports and notebooks may also
 ## Publishing
 
 The dedicated public repository is `Landotin/cicids2017-project-reviewer`. GitHub Pages is configured to use Actions. The workflow checks the reproducible build before publishing the HTML and aggregate evidence. Live deployment verification is recorded in [progress](PROGRESS.md).
+
+## 25 October — feature-guide checks
+
+- Build checks require exactly the fifteen saved baseline keys, the four C additions, and valid workflow links. Evidence hashes and every displayed measurement remain unchanged.
+- Twelve focused interaction checks passed: card counts, baseline default, all five group-filter counts, C toggle, T1 input distinction, workflow routes, and retained workflow/quiz counts. An actual extraction link opened the correct workflow phase.
+- Feature deep links land at the guide after initial opening and reloading. Tested at 360 and 1440 pixels; neither width caused full-page overflow. Screenshots were visually inspected.
+- Automated accessibility checks reported zero violations in the baseline and C feature views. Native buttons expose the current choice with `aria-pressed`; field names and formulas use keyboard-operable details controls.
+- A browser-generated print PDF contained all fifteen original field names and all four engineered field names, including the inactive feature panel. Existing offline architecture and the original full-reviewer checks remain in place.

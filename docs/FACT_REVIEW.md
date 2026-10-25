@@ -23,3 +23,11 @@ Final content SHA-256: `0c4b3bcd6979431cd42d09a6f1f09983032de339d280af1d04f85656
 Final facts SHA-256: `6859f3320b8367ea5d79a3ea2e324748cbd984f0393a87ecabdc9bdf4ab764ad`.
 
 The supervisor also added plain-English definitions of training, a decision tree, and Random Forest, and explained the model before the A–E settings. The completed reviewer has 26 glossary entries. These teaching changes preserve every measurement and evaluation decision.
+
+## 25 October — feature-guide supervisor review
+
+The added guide was checked against the canonical data dictionary and `reference_models.py`. Initial extraction computes fifteen values from packet windows before training. C's four later calculations and D/E's fitting-only selection are distinct from the W1/T1/T2/T3 settings trials. T1 retains the original fifteen inputs. Whole-frame byte lengths, first-retained-packet direction, packet flag counts, observed duration, and zero-denominator behavior match the implementation. The guide explains why a feature may help without claiming measured importance or diagnosing an attack from one value. The official 77-input representation remains a separate experiment.
+
+Updated content SHA-256: `26b20a5f1c123aa623101b1c0749a49f8c6908ef395aa0624a2e2f287562a369`.
+
+Facts SHA-256 remains `6859f3320b8367ea5d79a3ea2e324748cbd984f0393a87ecabdc9bdf4ab764ad`. No model, split, or measurement changed.

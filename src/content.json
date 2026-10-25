@@ -2,7 +2,8 @@
   "meta": {
     "title": "CICIDS2017 Project Reviewer",
     "subtitle": "A plain-language guide to the data, saved model, evidence, and limits",
-    "reviewedDate": "2026-10-23"
+    "reviewedDate": "2026-10-23",
+    "updatedDate": "2026-10-25"
   },
   "project": {
     "headline": "Can a Random Forest recognize attack patterns in network traffic?",
@@ -54,6 +55,172 @@
       "The official-flow benchmark used a matched, filtered cohort. Its scores are not a direct comparison with custom T1.",
       "This reviewer contains aggregate results and schemas, not raw packet rows, connection records, or IP addresses."
     ]
+  },
+  "featureGuide": {
+    "intro": "A feature is a number that describes traffic for a model. The packet-to-window step already extracts the 15 baseline features; later, Model C engineers four extra values from them. These are different steps.",
+    "where": [
+      {
+        "title": "Extract the baseline values",
+        "stage": "Step 5 · Extraction",
+        "what": "As the prepared data is built, packet rows are grouped into 60-second conversation windows and the 15 baseline values are calculated. Forward and backward mean the first retained packet's direction and its reverse, not automatically client/server or attacker/victim.",
+        "link": "#workflow/extraction"
+      },
+      {
+        "title": "Engineer and select inputs",
+        "stage": "Step 7 · A–E model comparison",
+        "what": "After the data split, C's four extra values are calculated from the baseline values before each fit or evaluation. D and E learn which columns to keep from fitting rows only; E selects 12 of the 19 expanded inputs. T1 does not use C's extra values.",
+        "link": "#workflow/baseline-training"
+      },
+      {
+        "title": "Tune settings with the same inputs",
+        "stage": "Step 8 · W1/T1/T2/T3 trials",
+        "what": "These trials change class weights or tree settings while keeping the original 15 baseline inputs. They do not add new feature columns.",
+        "link": "#workflow/feature-settings"
+      }
+    ],
+    "baseline": [
+      {
+        "key": "protocol",
+        "title": "Protocol",
+        "group": "Type and time",
+        "meaning": "The protocol number: TCP is 6 and UDP is 17.",
+        "why": "Helps the model interpret the other measurements: TCP has connection flags, while UDP does not."
+      },
+      {
+        "key": "duration_seconds",
+        "title": "Observed duration",
+        "group": "Type and time",
+        "meaning": "Seconds from the first included packet to the last; it can be less than 60.",
+        "why": "Helps distinguish a quick burst from activity spread over a longer time."
+      },
+      {
+        "key": "packet_count",
+        "title": "Packet count",
+        "group": "Amount and sizes",
+        "meaning": "The number of included packets in the window.",
+        "why": "Together with duration, shows how busy the window was."
+      },
+      {
+        "key": "total_bytes",
+        "title": "Total bytes",
+        "group": "Amount and sizes",
+        "meaning": "The sum of the included packets' whole frame lengths, in bytes.",
+        "why": "Helps compare light traffic with large transfers, even when packet counts are similar."
+      },
+      {
+        "key": "mean_packet_bytes",
+        "title": "Mean packet size",
+        "group": "Amount and sizes",
+        "meaning": "Total frame bytes divided by packet count.",
+        "why": "Helps distinguish many small messages from traffic made up of larger packets."
+      },
+      {
+        "key": "min_packet_bytes",
+        "title": "Smallest packet",
+        "group": "Amount and sizes",
+        "meaning": "The smallest included whole frame length, in bytes.",
+        "why": "Shows whether very small frames appear among the other traffic."
+      },
+      {
+        "key": "max_packet_bytes",
+        "title": "Largest packet",
+        "group": "Amount and sizes",
+        "meaning": "The largest included whole frame length, in bytes.",
+        "why": "Helps distinguish windows containing large frames from windows made up of small ones."
+      },
+      {
+        "key": "forward_packet_count",
+        "title": "Packets, first-seen direction",
+        "group": "Direction",
+        "meaning": "The number of packets moving in the direction of the first retained packet.",
+        "why": "Compared with the backward count, shows whether the exchange is balanced or mostly one-way."
+      },
+      {
+        "key": "backward_packet_count",
+        "title": "Packets, reverse direction",
+        "group": "Direction",
+        "meaning": "The number of packets moving opposite to the first retained packet.",
+        "why": "Shows how much traffic came back in the opposite direction, including windows with none."
+      },
+      {
+        "key": "forward_bytes",
+        "title": "Bytes, first-seen direction",
+        "group": "Direction",
+        "meaning": "The sum of whole frame lengths moving in the first retained packet's direction.",
+        "why": "Shows how much data moved in the first-seen direction; packet counts alone do not show its size."
+      },
+      {
+        "key": "backward_bytes",
+        "title": "Bytes, reverse direction",
+        "group": "Direction",
+        "meaning": "The sum of whole frame lengths moving opposite to the first retained packet.",
+        "why": "Compared with forward bytes, shows whether most of the data moved one way or both ways."
+      },
+      {
+        "key": "syn_count",
+        "title": "SYN flags",
+        "group": "Connection signs",
+        "meaning": "The number of included TCP packets with SYN set; UDP values are 0.",
+        "why": "Adds a clue about connection-start activity, especially when compared with acknowledgments and return traffic."
+      },
+      {
+        "key": "ack_count",
+        "title": "ACK flags",
+        "group": "Connection signs",
+        "meaning": "The number of included TCP packets with ACK set; UDP values are 0.",
+        "why": "Helps compare ongoing TCP exchanges with connection-start activity."
+      },
+      {
+        "key": "fin_count",
+        "title": "FIN flags",
+        "group": "Connection signs",
+        "meaning": "The number of included TCP packets with FIN set; UDP values are 0.",
+        "why": "Shows normal-closing messages, which can be compared with reset messages."
+      },
+      {
+        "key": "rst_count",
+        "title": "RST flags",
+        "group": "Connection signs",
+        "meaning": "The number of included TCP packets with RST set; UDP values are 0.",
+        "why": "Shows reset activity, which can occur when connections fail, are refused, or are ended abruptly."
+      }
+    ],
+    "engineered": [
+      {
+        "key": "forward_backward_packet_ratio",
+        "title": "Forward-to-backward packet ratio",
+        "group": "Model C extras",
+        "meaning": "Forward packet count divided by backward packet count; 0 when the denominator is 0.",
+        "why": "Makes a direction imbalance easier to express with one number, instead of two separate counts.",
+        "formula": "forward_packet_count / backward_packet_count; 0 if backward_packet_count is 0"
+      },
+      {
+        "key": "forward_backward_byte_ratio",
+        "title": "Forward-to-backward byte ratio",
+        "group": "Model C extras",
+        "meaning": "Forward bytes divided by backward bytes; 0 when the denominator is 0.",
+        "why": "Makes an imbalance in data volume easier to express, even if packet sizes differ.",
+        "formula": "forward_bytes / backward_bytes; 0 if backward_bytes is 0"
+      },
+      {
+        "key": "forward_packet_share",
+        "title": "Forward packet share",
+        "group": "Model C extras",
+        "meaning": "Forward packet count divided by total packet count.",
+        "why": "Shows how much of the packet activity belongs to the first-seen direction on a zero-to-one scale.",
+        "formula": "forward_packet_count / packet_count"
+      },
+      {
+        "key": "no_backward_packets",
+        "title": "No backward packets",
+        "group": "Model C extras",
+        "meaning": "1 when backward packet count is 0; otherwise 0.",
+        "why": "Separately marks a window with no return packets, since the ratio calculation also returns zero when it cannot divide.",
+        "formula": "1 if backward_packet_count == 0; otherwise 0"
+      }
+    ],
+    "note": "These are reasons a measurement might be useful, not measured feature-importance rankings. No single value proves that a row is an attack.",
+    "official": "In Step 10, CICFlowMeter had already extracted the 77 numeric measurements in its official flow CSVs. We separately calculated 15 flow-level analogs from supplied columns, including duration conversion and packet/byte totals and means. These are different flow rows from the custom windows; the 77 were not made from our 15 baseline values, and C's four extras are not used by T1."
   },
   "stages": [
     {
@@ -161,16 +328,17 @@
     {
       "id": "extraction",
       "title": "Extract window features",
-      "plain": "Summarize packets into 15 numbers for each 60-second conversation window.",
-      "what": "The initial feature extraction groups packet rows by conversation and time window, then calculates counts and statistics for protocol, duration, bytes, packet sizes, direction, and TCP flags.",
+      "plain": "Step 5: turn packets into 15 summary values for each 60-second conversation window.",
+      "what": "Feature extraction happens while the prepared data is built: packet rows are grouped by conversation and time window, then counts and statistics are calculated. Forward and backward mean the first retained packet's direction and its reverse, not automatically client/server or attacker/victim.",
       "why": "A fixed-size summary gives the model numerical descriptions of each window instead of one model row per packet.",
       "input": "Packet rows, timestamps, direction and protocol fields, and the conversation grouping rules.",
       "output": "One prepared window row with 15 baseline predictors plus four metadata fields.",
-      "finding": "The 15 predictors already exist before model training. Model C later adds four derived predictors; T1 stays with the original 15.",
-      "spoken": "Feature extraction is the packet-to-window step. T1 uses those 15 original summaries; C is the experiment that adds four more inputs.",
+      "finding": "The 15 baseline predictors are already in each prepared row before the A–E model comparison begins. C's four engineered values are added later; T1 keeps the original 15.",
+      "spoken": "We extracted 15 baseline values as packets became 60-second window summaries. Later, Model C engineered four more from those values.",
       "details": [
-        "The 47 packet columns are not reduced to 15 by dropping columns or using PCA.",
-        "C's four added inputs are forward-to-backward packet ratio, forward-to-backward byte ratio, forward packet share, and a no-backward-packets indicator."
+        "The 47-column packet table is not cut down to 15 columns; grouping packets and calculating summaries creates the baseline features.",
+        "Duration is the last included packet time minus the first, so it can be less than the 60-second window length. Byte totals use whole frame lengths.",
+        "Forward/backward direction follows the first retained packet, not a client/server or attacker/victim role."
       ]
     },
     {
@@ -190,26 +358,26 @@
     },
     {
       "id": "baseline-training",
-      "title": "Train the first model set",
-      "plain": "Training means learning how traffic measurements relate to known labels.",
-      "what": "We trained Random Forest models, each combining 80 decision trees. A tree learns a series of questions about measurements, such as packet counts. The forest combines the trees’ estimates to choose a traffic label. We compared five saved designs named A through E.",
-      "why": "This first set checks whether class weighting, added summaries, or selecting fewer inputs changes supported-class scores.",
+      "title": "Fit baseline and engineered-feature models",
+      "plain": "Step 7: training learns patterns from examples with known labels.",
+      "what": "We trained Random Forests that combine 80 decision trees. A tree learns questions about measurements, such as packet counts; the forest combines the trees' estimates to choose a label. A and B use the 15 baseline predictors; B also uses balanced class weights. C calculates four extra values after the split and before each fit or evaluation, giving it 19 inputs. D selects eight of the 15; E selects 12 from the expanded 19.",
+      "why": "This comparison asks whether calculated values or a smaller selected set change the measured scores.",
       "input": "Training rows, 15 baseline predictors, and the saved A–E model settings.",
       "output": "Validation and three-fold grouped-CV results for the historical model set.",
       "finding": "C had the best mean CV Macro F1 among A–E at 66.10%; later eligible trials placed T1 ahead of C.",
       "spoken": "The first comparison gave us a useful reference, but the final selection included later trials too.",
       "details": [
-        "A and B use 15 baseline predictors; B adds balanced class weights. C uses 19 predictors after adding four values. D selects 8 from the original 15, and E selects 12 from the expanded 19.",
-        "The original A–E forests used 80 trees, depth 12, leaf size 2, seed 42, and two CPU workers.",
-        "Selectors and class weights are fitted using fitting rows, not held-out test values."
+        "This is where the A–E input changes happen; they are separate from the earlier packet-to-window extraction in Step 5.",
+        "D/E selectors learn which columns to keep from fitting rows only, then use that saved choice on validation and test rows.",
+        "The original A–E forests used 80 trees, depth 12, leaf size 2, seed 42, and two CPU workers."
       ]
     },
     {
       "id": "feature-settings",
-      "title": "Try settings and added inputs",
-      "plain": "Test four new weight or tree-setting choices, then check the shortlisted trials on all three folds.",
+      "title": "Tune settings with the same 15 inputs",
+      "plain": "Step 8: change weights or tree details while keeping the original 15 predictors.",
       "what": "W1 changes the class-weight rule, T1 uses a deeper forest, T2 uses smaller leaves, and T3 combines a deeper forest with smaller leaves. Each uses the baseline 15 predictors.",
-      "why": "These trials ask whether different treatment of rare classes or tree detail helps on the saved data.",
+      "why": "These trials ask whether weight or tree settings change results while the input definition stays fixed.",
       "input": "Training and validation rows, the same baseline predictor definition, and fixed settings for each trial.",
       "output": "Four validation results; T1 and T3 also receive all three saved grouped-CV fits.",
       "finding": "T1 averaged 71.43% Macro F1 across the three folds with an 8.49-point sample SD. W1 and T2 CV was Not run because they were not shortlisted.",

@@ -87,6 +87,23 @@
     .feature-scope-note summary { color: var(--teal); font-size: .76rem; font-weight: 800; cursor: pointer; }
     .feature-name-list { display: flex; flex-wrap: wrap; gap: 5px; margin: 9px 0 0; padding: 0; list-style: none; }
     .feature-name-list li { padding: 4px 7px; background: #f1eee6; color: var(--ink-soft); font: .7rem ui-monospace, SFMono-Regular, Consolas, monospace; }
+    .feature-guide { scroll-margin-top: 95px; }
+    .feature-where-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
+    .feature-where-card { padding: 19px; }
+    .feature-where-card h4 { margin: 7px 0; font: 700 1.3rem/1.2 var(--serif); }
+    .feature-where-card p { color: var(--ink-soft); font-size: .9rem; }
+    .feature-where-card a { font-size: .85rem; font-weight: 700; }
+    .feature-controls { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 12px; }
+    .feature-controls button[aria-pressed="true"] { background: var(--ink); color: white; }
+    .feature-set-heading { margin: 24px 0 8px; font: 700 1.45rem/1.2 var(--serif); }
+    .feature-guide-card { min-width: 0; padding: 18px; }
+    .feature-guide-card h5 { margin: 8px 0; font: 700 1.23rem/1.15 var(--serif); }
+    .feature-guide-card p { margin: 7px 0; color: var(--ink-soft); font-size: .88rem; }
+    .feature-guide-card .feature-why { padding-top: 9px; border-top: 1px solid var(--line); }
+    .feature-guide-card summary { color: var(--teal); cursor: pointer; font-size: .8rem; font-weight: 700; }
+    .feature-guide-card code { overflow-wrap: anywhere; font-size: .75rem; }
+    .feature-guide-note { padding: 15px 18px; margin-top: 16px; border-left: 3px solid var(--teal); color: var(--ink-soft); font-size: .88rem; }
+    @media (max-width: 700px) { .feature-where-grid { grid-template-columns: 1fr; } }
     .stage-flow { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
     .stage-button { position: relative; min-height: 138px; padding: 15px 14px; border: 1px solid var(--line); background: var(--paper-light); text-align: left; cursor: pointer; transition: border-color .18s ease, background .18s ease, transform .18s ease; }
     .stage-button:hover { transform: translateY(-2px); border-color: var(--teal); }
@@ -447,6 +464,31 @@
         <div class="stage-flow" id="stage-flow" aria-label="Clickable data stages"></div>
         <div class="stage-details" id="stage-details" aria-live="polite"></div>
 
+        <section class="feature-guide" id="feature-guide" aria-labelledby="feature-guide-heading">
+          <div class="section-head">
+            <div><span class="section-tag">Our feature work</span><h3 id="feature-guide-heading">What did we extract and engineer?</h3></div>
+          </div>
+          <p class="lede" id="feature-guide-intro"></p>
+          <div class="feature-where-grid" id="feature-where"></div>
+          <div class="feature-controls no-print" id="feature-set-controls" role="group" aria-label="Choose the feature set">
+            <button class="button small" type="button" data-feature-mode="baseline" aria-pressed="true" aria-controls="feature-panel-baseline">15 extracted features · T1</button>
+            <button class="button small" type="button" data-feature-mode="engineered" aria-pressed="false" aria-controls="feature-panel-engineered">4 extra engineered features · C</button>
+          </div>
+          <div class="feature-controls no-print" id="feature-group-controls" role="group" aria-label="Filter baseline feature descriptions"></div>
+          <p class="source-note no-print" id="feature-filter-status" aria-live="polite"></p>
+          <section id="feature-panel-baseline" data-feature-panel="baseline" aria-labelledby="baseline-guide-title">
+            <h4 class="feature-set-heading" id="baseline-guide-title">The 15 summaries used by T1</h4>
+            <div class="story-grid" id="baseline-feature-cards"></div>
+          </section>
+          <section id="feature-panel-engineered" data-feature-panel="engineered" aria-labelledby="engineered-guide-title" hidden>
+            <h4 class="feature-set-heading" id="engineered-guide-title">The four extra values tested in Model C</h4>
+            <p class="source-note">C used 15 + 4 = 19 predictors. The selected T1 model kept the original 15.</p>
+            <div class="story-grid" id="engineered-feature-cards"></div>
+          </section>
+          <p class="paper-card feature-guide-note" id="feature-relevance-note"></p>
+          <p class="paper-card feature-guide-note" id="official-feature-origin"></p>
+        </section>
+
         <div class="section-head">
           <div><span class="section-tag">Small demonstrations</span><h3>Two ideas, with toy data</h3></div>
           <p>These are miniature illustrations for learning. They are not records or measurements from the reviewed dataset.</p>
@@ -532,6 +574,10 @@
           <div><p class="kicker">03 / Findings</p><h2>Read each result in its own frame</h2><p class="lede">The custom T1 held-out test and the official feature comparison use different cohorts and evaluation setups. Select one view at a time.</p></div>
           <aside class="intro-note" aria-label="Keep the scopes clear"><strong>Keep the scopes clear</strong>The custom final test and the official cross-validation comparison do not share a ranking chart.</aside>
         </div>
+        <aside class="paper-card feature-scope-note" aria-label="Feature extraction and engineering guide">
+          <strong>Where did these features come from?</strong> We extracted 15 packet-window summaries before splitting. Model C later tested four extra calculated values; T1 kept the original 15.
+          <a href="#project/features">See where each step happened and why each feature may help →</a>
+        </aside>
         <div class="findings-switch no-print" role="group" aria-label="Choose findings view">
           <button type="button" data-finding-mode="custom" aria-pressed="true">Custom experiment</button>
           <button type="button" data-finding-mode="official" aria-pressed="false">Official comparison</button>
@@ -624,7 +670,7 @@
     const split = facts.split || {};
     const test = facts.test || {};
     const official = facts.official || {};
-    const state = { tab: "project", stage: "", phase: "", findingMode: "custom", reviewed: [], storageOK: true };
+    const state = { tab: "project", stage: "", phase: "", findingMode: "custom", featureMode: "baseline", featureGroup: "All", reviewed: [], storageOK: true };
     const storageKey = "cicids2017-reviewer-progress-v1";
 
     function escapeHTML(value) {
@@ -697,7 +743,7 @@
       document.title = title + " · reviewer";
       setText("site-title", title);
       setText("site-subtitle", safeText(meta.subtitle, "A guided review of the dataset, workflow, findings, and practice questions."));
-      setText("reviewed-date", meta.reviewedDate ? "Reviewed " + meta.reviewedDate : "");
+      setText("reviewed-date", (meta.reviewedDate ? "Results reviewed " + meta.reviewedDate : "") + (meta.updatedDate ? " · Guide updated " + meta.updatedDate : ""));
       setText("project-headline", safeText(project.headline, title));
       setText("project-intro", safeText(project.intro, ""));
     }
@@ -756,6 +802,38 @@
       document.getElementById("glossary-list").innerHTML = glossary.map(function (item, index) {
         return '<details data-glossary-entry><summary>' + escapeHTML(safeText(item.term, "Term " + (index + 1))) + '</summary><p><strong>' + escapeHTML(safeText(item.plain, "")) + '</strong>' + (item.detail ? ' ' + escapeHTML(item.detail) : "") + '</p></details>';
       }).join("");
+    }
+
+    function renderFeatureGuide() {
+      const guide = content.featureGuide || {};
+      setText("feature-guide-intro", guide.intro || "");
+      setText("feature-relevance-note", guide.note || "");
+      setText("official-feature-origin", guide.official || "");
+      document.getElementById("feature-where").innerHTML = arrayOrEmpty(guide.where).map(function (item) {
+        return '<article class="paper-card feature-where-card"><span class="kicker">' + escapeHTML(item.stage) + '</span><h4>' + escapeHTML(item.title) + '</h4><p>' + escapeHTML(item.what) + '</p><a href="' + escapeHTML(safeLink(item.link)) + '">Open this workflow phase →</a></article>';
+      }).join("");
+      ["baseline", "engineered"].forEach(function (kind) {
+        document.getElementById(kind + "-feature-cards").innerHTML = arrayOrEmpty(guide[kind]).map(function (item) {
+          return '<article class="paper-card feature-guide-card" data-feature-group="' + escapeHTML(item.group) + '"><span class="kicker">' + escapeHTML(item.group) + '</span><h5>' + escapeHTML(item.title) + '</h5><p>' + escapeHTML(item.meaning) + '</p><p class="feature-why"><strong>Why it may help:</strong> ' + escapeHTML(item.why) + '</p><details><summary>See the field name' + (item.formula ? ' and calculation' : '') + '</summary><p><code>' + escapeHTML(item.key) + '</code></p>' + (item.formula ? '<p>' + escapeHTML(item.formula) + '</p>' : '') + '</details></article>';
+        }).join("");
+      });
+      const groups = ["All", "Type and time", "Amount and sizes", "Direction", "Connection signs"];
+      document.getElementById("feature-group-controls").innerHTML = groups.map(function (group) {
+        return '<button class="button small" type="button" data-feature-group-filter="' + escapeHTML(group) + '" aria-pressed="' + (group === "All" ? "true" : "false") + '">' + escapeHTML(group) + '</button>';
+      }).join("");
+      updateFeatureGuide();
+    }
+    function updateFeatureGuide() {
+      document.querySelectorAll("[data-feature-mode]").forEach(function (button) { button.setAttribute("aria-pressed", String(button.getAttribute("data-feature-mode") === state.featureMode)); });
+      document.querySelectorAll("[data-feature-panel]").forEach(function (panel) { panel.hidden = panel.getAttribute("data-feature-panel") !== state.featureMode; });
+      document.getElementById("feature-group-controls").style.display = state.featureMode === "baseline" ? "flex" : "none";
+      document.querySelectorAll("[data-feature-group-filter]").forEach(function (button) { button.setAttribute("aria-pressed", String(button.getAttribute("data-feature-group-filter") === state.featureGroup)); });
+      let count = 0;
+      document.querySelectorAll("#baseline-feature-cards [data-feature-group]").forEach(function (card) {
+        card.hidden = state.featureGroup !== "All" && card.getAttribute("data-feature-group") !== state.featureGroup;
+        if (!card.hidden) count += 1;
+      });
+      setText("feature-filter-status", state.featureMode === "baseline" ? "Showing " + count + " of 15 extracted features. These describe each conversation window." : "Showing all four extra features tested in Model C. T1 does not use these four extras.");
     }
 
     function activateStage(id, updateHash) {
@@ -957,11 +1035,13 @@
       if (tab === "workflow" && parts[1]) activatePhase(parts[1], false);
       if (tab === "findings" && parts[1]) setFindingMode(parts[1], false);
       switchTab(tab, false);
+      if (tab === "project" && parts[1] === "features") window.requestAnimationFrame(function () { document.getElementById("feature-guide").scrollIntoView({ block: "start", behavior: "instant" }); });
     }
 
     renderHeader();
     loadProgress();
     renderProject();
+    renderFeatureGuide();
     renderWorkflow();
     renderCustomFindings();
     renderOfficialFindings();
@@ -980,6 +1060,19 @@
         if (event.key === "End") next = tabs.length - 1;
         if (next !== null) { event.preventDefault(); tabs[next].focus(); tabs[next].click(); }
       });
+    });
+    document.getElementById("feature-set-controls").addEventListener("click", function (event) {
+      const button = event.target.closest("[data-feature-mode]");
+      if (!button) return;
+      state.featureMode = button.getAttribute("data-feature-mode");
+      state.featureGroup = "All";
+      updateFeatureGuide();
+    });
+    document.getElementById("feature-group-controls").addEventListener("click", function (event) {
+      const button = event.target.closest("[data-feature-group-filter]");
+      if (!button) return;
+      state.featureGroup = button.getAttribute("data-feature-group-filter");
+      updateFeatureGuide();
     });
     document.getElementById("stage-flow").addEventListener("click", function (event) {
       const button = event.target.closest("[data-stage]");
@@ -1099,6 +1192,7 @@
       window.setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
     });
     window.addEventListener("hashchange", readHash);
+    window.addEventListener("pageshow", readHash);
   }());
   </script>
 </body>
