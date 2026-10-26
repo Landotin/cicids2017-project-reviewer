@@ -873,13 +873,19 @@
       "title": "C+T1 follow-up results and runnable demo",
       "url": "https://github.com/Landotin/cicids2017-model-demo",
       "access": "public",
-      "why": "Reviewed 19-input follow-up, model identities, 31 real validation examples and local demo instructions. Hosting setup is still pending."
+      "why": "Reviewed 19-input follow-up, model identities, 31 real validation examples and local demo instructions. The separate public Streamlit app has been deployed and checked."
     },
     {
       "title": "C+T1 same-fold comparison",
       "url": "https://landotin.github.io/cicids2017-project-reviewer/evidence/ct1_cv_comparison.csv",
       "access": "public",
       "why": "Aggregate CV comparison of B, C, T1 and CT1; historical timing values use a different runtime and did not decide ranking."
+    },
+    {
+      "title": "Live T1 and C+T1 demonstration",
+      "url": "https://cicids2017-model-demo.streamlit.app/",
+      "access": "public",
+      "why": "Predict with two saved models; inspect nineteen-input engineering, upload prepared measurements and download reviewed examples. No fitting occurs in the app."
     }
   ]
 }

@@ -49,3 +49,7 @@ The dedicated repository is public. Its publishing source is **GitHub Actions**,
 If the page does not update, inspect the **Check and publish reviewer** workflow under Actions. Keep the generated `index.html` committed so users can also download the file from the repository.
 
 See `docs/PROGRESS.md` for implementation and verification status.
+
+## C+T1 follow-up, 26 October 2026
+
+The findings tab now separates the later C+T1 exploratory results from the historical T1 test. [Live model demo](https://cicids2017-model-demo.streamlit.app/) · [Public demo repository](https://github.com/Landotin/cicids2017-model-demo). Mean CV Macro F1 was 72.30% for CT1 versus T1’s 71.43%; CT1 has no independent test result.
