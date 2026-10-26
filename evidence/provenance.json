@@ -1,8 +1,8 @@
 {
-  "reviewed_date": "2026-10-23",
+  "reviewed_date": "2026-10-26",
   "source_repository": "https://github.com/xtian413/CICIDS2017-Attack-Classification",
   "source_revision": "5170ec1458c05dd8fe230cccb157a52af47fb1b4",
-  "scope": "Reviewed aggregate measurements only; no packet records, connection identifiers, credentials, or model binaries.",
+  "scope": "Current custom-PCAP study only. Official-flow evidence files are historical and outside the report. CT1 test uses previously examined original holdout; not fresh independent confirmation.",
   "files": [
     {
       "file": "v1_validation.csv",
@@ -93,6 +93,26 @@
       "file": "ct1_decision.json",
       "source_path": "Reviewed CT1 run handoff and decision, 26 October 2026",
       "sha256": "759ee01c9a84102d8ee7c51190e3bf9c471ba2418164ce91ee1c432ee9bbc9d1"
+    },
+    {
+      "file": "ct1_test_metrics.csv",
+      "source_path": "results/ct1_test/metrics.csv",
+      "sha256": "12d7e781f5d3c64e4ec00b799d71bac33d1e866763fe0f427102eff38bc24293"
+    },
+    {
+      "file": "ct1_test_per_class.csv",
+      "source_path": "results/ct1_test/per_class.csv",
+      "sha256": "d92c306f63d54fc89644bdc2207edc9675bf96e5fd3cacf97a61c08c8aa172af"
+    },
+    {
+      "file": "ct1_test_complete.json",
+      "source_path": "results/ct1_test/complete.json",
+      "sha256": "47ee3fdfa65dc93c5fa6f589bd08338886f16c90b1f87ade08317dab6c1dd0fb"
+    },
+    {
+      "file": "ct1_test_supervisor_review.json",
+      "source_path": "results/ct1_test/supervisor_review.json",
+      "sha256": "1b771b232042df1a644e9bdc01203c341db1a0957fad1d2a4a3b114e2eb2edbe"
     }
   ],
   "followup_reviewed_date": "2026-10-26",

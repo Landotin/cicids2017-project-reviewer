@@ -446,7 +446,7 @@
             <h2 class="project-title" id="project-headline">A closer look at network intrusion detection</h2>
             <p class="lede" id="project-intro"></p>
           </div>
-          <aside class="intro-note" aria-label="How to use this reviewer"><strong>How to use this reviewer</strong>Move through the project, follow each workflow phase, then inspect custom and official findings in their separate views.</aside>
+          <aside class="intro-note" aria-label="How to use this reviewer"><strong>How to use this reviewer</strong>Move through the project, follow each workflow phase, then inspect the selected model and its class-level results.</aside>
         </div>
 
         <div class="section-head">
@@ -571,8 +571,8 @@
 
       <section class="tab-panel" id="panel-findings" role="tabpanel" aria-labelledby="tab-findings" tabindex="0" hidden>
         <div class="page-intro">
-          <div><p class="kicker">03 / Findings</p><h2>Read each result in its own frame</h2><p class="lede">The custom T1 held-out test and the official feature comparison use different cohorts and evaluation setups. Select one view at a time.</p></div>
-          <aside class="intro-note" aria-label="Keep the scopes clear"><strong>Keep the scopes clear</strong>The custom final test and the official cross-validation comparison do not share a ranking chart.</aside>
+          <div><p class="kicker">03 / Findings</p><h2>Read each result in its own frame</h2><p class="lede">Follow the custom-feature experiments to the selected 19-input model, then inspect its test scores and limitations.</p></div>
+          <aside class="intro-note" aria-label="Keep the scopes clear"><strong>Keep the scopes clear</strong>CV, validation and test scores use different rows. The test was previously examined for an earlier model; it is not fresh independent evidence.</aside>
         </div>
         <aside class="paper-card feature-scope-note" aria-label="Feature extraction and engineering guide">
           <strong>Where did these features come from?</strong> We extracted 15 packet-window summaries before splitting. Model C later tested four extra calculated values; T1 kept the original 15.
@@ -580,11 +580,10 @@
         </aside>
         <div class="findings-switch no-print" role="group" aria-label="Choose findings view">
           <button type="button" data-finding-mode="custom" aria-pressed="true">Custom experiment</button>
-          <button type="button" data-finding-mode="official" aria-pressed="false">Official comparison</button>
         </div>
         <section id="custom-view" aria-labelledby="custom-view-title">
           <div class="findings-context"><span class="cohort-badge">Custom experiment</span><span id="custom-context"></span></div>
-          <h3 class="sr-only" id="custom-view-title">Custom T1 experiment results</h3>
+          <h3 class="sr-only" id="custom-view-title">Selected custom-model results</h3>
           <!-- CT1_FOLLOWUP -->
           <div class="metric-grid" id="custom-metrics"></div>
           <div class="result-layout">
@@ -595,35 +594,23 @@
               <div class="support-summary" id="split-meta"></div>
             </article>
             <article class="paper-card result-card">
-              <h3>Frozen T1 test summary</h3>
+              <h3>Selected model test summary</h3>
               <p class="card-lede">Metrics are shown as reported for the selected custom model.</p>
               <dl class="summary-list" id="test-summary"></dl>
             </article>
           </div>
           <details class="table-expander" id="models-expander">
-            <summary>Expand all nine model rows and settings</summary>
-            <p class="table-note">A–E, W1, T1, T2, and T3 are shown together for model-level context. Null CV values are reported as “Not run.”</p>
+            <summary>Expand all ten model rows and settings</summary>
+            <p class="table-note">A–E, W1, T1, T2, T3 and CT1 are shown together for model-level context. Null CV values are reported as “Not run.”</p>
             <div class="table-wrap" id="models-table-wrap" tabindex="0" role="region" aria-label="Custom model settings and scores; scroll horizontally if needed"></div>
           </details>
           <div class="section-head">
             <div><span class="section-tag">Held-out evaluation</span><h3>Per-class test support and F1</h3></div>
             <p>Support is the number of test examples in a class. A zero or absent test class has no defined F1 and is shown as N/A.</p>
           </div>
-          <div class="paper-card table-wrap" id="per-class-table-wrap" tabindex="0" role="region" aria-label="T1 test scores by class; scroll horizontally if needed"></div>
+          <div class="paper-card table-wrap" id="per-class-table-wrap" tabindex="0" role="region" aria-label="CT1 test scores by class; scroll horizontally if needed"></div>
         </section>
-        <section id="official-view" aria-labelledby="official-view-title" hidden>
-          <div class="findings-context"><span class="cohort-badge official">Official comparison</span><span id="official-context"></span></div>
-          <h3 class="sr-only" id="official-view-title">Official feature comparison results</h3>
-          <div class="official-topline" id="official-topline"></div>
-          <div class="official-heading"><h3>Mean cross-validation macro F1</h3><p>Two separate feature arms; standard deviation is in percentage points.</p></div>
-          <div class="arm-grid" id="official-arms"></div>
-          <div class="gain-panel">
-            <article class="paper-card gain-card" id="gain-card"></article>
-            <article class="paper-card rare-card"><h4>Rare-class check</h4><div class="table-wrap rare-table" id="rare-classes-table" tabindex="0" role="region" aria-label="Rare class scores in the official comparison; scroll horizontally if needed"></div></article>
-          </div>
-          <article class="paper-card limits-card" style="margin-top:13px" id="official-limits"></article>
-          <p class="limitation-note">This is the reviewed official cohort’s cross-validation comparison. Interpret its mean CV result within that cohort; it does not rank against the custom T1 frozen final test.</p>
-        </section>
+
       </section>
 
       <section class="tab-panel" id="panel-practice" role="tabpanel" aria-labelledby="tab-practice" tabindex="0" hidden>
@@ -670,7 +657,6 @@
     const dataset = facts.dataset || {};
     const split = facts.split || {};
     const test = facts.test || {};
-    const official = facts.official || {};
     const state = { tab: "project", stage: "", phase: "", findingMode: "custom", featureMode: "baseline", featureGroup: "All", reviewed: [], storageOK: true };
     const storageKey = "cicids2017-reviewer-progress-v1";
 
@@ -908,14 +894,14 @@
     }
 
     function renderCustomFindings() {
-      const t1 = models.find(function (model) { return String(model.name).toUpperCase() === "T1"; }) || {};
+      const t1 = models.find(function (model) { return String(model.name).toUpperCase() === "CT1"; }) || {};
       const meta = content.meta || {};
-      setText("custom-context", "T1 frozen final test · reviewed " + safeText(test.date || meta.reviewedDate, "date not specified"));
+      setText("custom-context", "CT1 · previously examined test · reviewed " + safeText(test.date || meta.reviewedDate, "date not specified"));
       document.getElementById("custom-metrics").innerHTML = [
-        metricCard("T1 test · macro F1", percent(test.macroF1), "Frozen held-out test"),
-        metricCard("T1 test · accuracy", percent(test.accuracy), integer(test.rows) + " evaluated rows"),
-        metricCard("T1 training · grouped CV F1", t1.cvMacroF1 == null ? "Not run" : percent(t1.cvMacroF1), "Fold mean; SD " + (t1.cvSd == null ? "Not run" : percentagePoints(t1.cvSd))),
-        metricCard("T1 test · false alarm rate", percent(test.falseAlarmRate), integer(test.falseAlarms) + " false alarms among " + integer(test.benignRows) + " benign rows")
+        metricCard("CT1 test · macro F1", percent(test.macroF1), "Previously examined original test"),
+        metricCard("CT1 test · accuracy", percent(test.accuracy), integer(test.rows) + " evaluated rows"),
+        metricCard("CT1 training · grouped CV F1", t1.cvMacroF1 == null ? "Not run" : percent(t1.cvMacroF1), "Fold mean; SD " + (t1.cvSd == null ? "Not run" : percentagePoints(t1.cvSd))),
+        metricCard("CT1 test · false alarm rate", percent(test.falseAlarmRate), integer(test.falseAlarms) + " false alarms among " + integer(test.benignRows) + " benign rows")
       ].join("");
 
       const parts = arrayOrEmpty(split.parts);
@@ -951,45 +937,10 @@
       }).join("") + '</tbody></table>';
     }
 
-    function officialFeatureLabel(index) {
-      return index === 0 ? "15 flow analogs" : "77 official measurements";
-    }
-    function renderOfficialFindings() {
-      const arms = arrayOrEmpty(official.arms);
-      const groupsLabel = official.groups && typeof official.groups === "object" ? safeText(official.groups.count || official.groups) : integer(official.groups);
-      setText("official-context", "23 October reviewed cohort · cross-validation feature comparison");
-      document.getElementById("official-topline").innerHTML = [
-        ["Eligible rows", integer(official.eligibleRows)], ["Scored rows", integer(official.scoredRows)], ["Groups", groupsLabel], ["Heartbleed flows", integer(official.heartbleedFlows)]
-      ].map(function (item) { return '<div class="official-mini"><strong>' + escapeHTML(item[1]) + '</strong><span>' + escapeHTML(item[0]) + '</span></div>'; }).join("");
-      document.getElementById("official-arms").innerHTML = arms.map(function (arm, index) {
-        const scoreText = percent(arm.macroF1);
-        const numericScore = Number(arm.macroF1);
-        const width = Number.isFinite(numericScore) ? Math.max(0, Math.min(100, numericScore * 100)) : 0;
-        const title = safeText(arm.title, "Feature arm " + (index + 1));
-        const description = typeof arm.features === "number" ? integer(arm.features) + " features in this arm." : safeText(arm.features, officialFeatureLabel(index));
-        const chartLabel = officialFeatureLabel(index) + " mean CV macro F1 " + scoreText;
-        const metrics = [
-          ["SD", arm.sd == null ? "N/A" : percentagePoints(arm.sd)], ["False alarm rate", percent(arm.falseAlarmRate)], ["Accuracy", percent(arm.accuracy)],
-          ["Kappa", decimal(arm.kappa, 4)], ["False alarms", integer(arm.falseAlarms)], ["Fit time", seconds(arm.fitSeconds)], ["Prediction time", seconds(arm.predictionSeconds)], ["Errors", integer(arm.errors)]
-        ];
-        return '<article class="arm-card"><span class="cohort-badge official">' + escapeHTML(officialFeatureLabel(index)) + '</span><h4>' + escapeHTML(title) + '</h4><p class="arm-description">' + escapeHTML(description) + '</p><div class="arm-scoreline"><span>Mean CV macro F1</span><strong>' + escapeHTML(scoreText) + '</strong></div><div class="arm-track" role="img" aria-label="' + escapeHTML(chartLabel) + '"><div class="arm-fill" style="width:' + width.toFixed(2) + '%"></div></div><dl class="arm-metrics">' + metrics.map(function (item) { return '<div><dt>' + escapeHTML(item[0]) + '</dt><dd>' + escapeHTML(item[1]) + '</dd></div>'; }).join("") + '</dl></article>';
-      }).join("");
-
-      const gains = arrayOrEmpty(official.pairedFoldGains);
-      const gainMarkup = gains.length ? '<div class="gain-chips" aria-label="Paired fold gains">' + gains.map(function (gain, index) { return '<span class="gain-chip">Fold ' + (index + 1) + ': ' + escapeHTML(percentagePoints(gain)) + '</span>'; }).join("") + '</div>' : '<p>No paired fold gains were supplied.</p>';
-      document.getElementById("gain-card").innerHTML = '<h4>Paired comparison</h4><div class="gain-big">' + escapeHTML(percentagePoints(official.gain)) + '</div><p>Mean paired macro F1 gain, expressed in percentage points.</p>' + gainMarkup + '<div class="error-pair"><div><strong>' + escapeHTML(integer(official.correctedErrors)) + '</strong><span>Corrected errors</span></div><div><strong>' + escapeHTML(integer(official.introducedErrors)) + '</strong><span>Introduced errors</span></div></div>';
-
-      document.getElementById("rare-classes-table").innerHTML = '<table><caption class="sr-only">Rare class supports and F1 scores in official comparison</caption><thead><tr><th>Rare class</th><th class="numeric">Support</th><th class="numeric">F1</th></tr></thead><tbody>' + arrayOrEmpty(official.rareClasses).map(function (entry) {
-        return '<tr><td><strong>' + escapeHTML(safeText(entry.label, "Class")) + '</strong></td><td class="numeric">' + escapeHTML(integer(entry.support)) + '</td><td class="numeric">' + escapeHTML(percent(entry.f1)) + '</td></tr>';
-      }).join("") + '</tbody></table>';
-      document.getElementById("official-limits").innerHTML = '<h4>Read alongside these limits</h4><ul>' + arrayOrEmpty(official.notes).map(function (note) { return '<li>' + escapeHTML(note) + '</li>'; }).join("") + '</ul>';
-    }
-
     function setFindingMode(mode, updateHash) {
-      state.findingMode = mode === "official" ? "official" : "custom";
+      state.findingMode = "custom";
       document.querySelectorAll("[data-finding-mode]").forEach(function (button) { button.setAttribute("aria-pressed", String(button.getAttribute("data-finding-mode") === state.findingMode)); });
       document.getElementById("custom-view").hidden = state.findingMode !== "custom";
-      document.getElementById("official-view").hidden = state.findingMode !== "official";
       if (updateHash) writeHash("findings/" + state.findingMode);
     }
 
@@ -1045,7 +996,6 @@
     renderFeatureGuide();
     renderWorkflow();
     renderCustomFindings();
-    renderOfficialFindings();
     renderPractice();
     readHash();
 

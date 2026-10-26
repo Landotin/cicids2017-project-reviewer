@@ -154,7 +154,7 @@
       "validationFalseAlarmRate": 0.005634020992037417,
       "cvMacroF1": 0.714279003730609,
       "cvSd": 0.08490393370391222,
-      "selected": true,
+      "selected": false,
       "notes": "All models use 80 trees and seed 42."
     },
     {
@@ -186,69 +186,85 @@
       "cvSd": 0.08207058330956568,
       "selected": false,
       "notes": "All models use 80 trees and seed 42."
+    },
+    {
+      "name": "CT1",
+      "features": 19,
+      "featureDescription": "15 extracted measurements + 4 calculated direction relationships",
+      "weight": "Balanced",
+      "depth": 20,
+      "leaf": 2,
+      "validationMacroF1": 0.7803373075284699,
+      "validationAccuracy": 0.9949568426099066,
+      "validationFalseAlarmRate": 0.00563152253483474,
+      "cvMacroF1": 0.722988840889803,
+      "cvSd": 0.07571507433871208,
+      "selected": true,
+      "notes": "Selected before CT1 test scoring; same original training partition."
     }
   ],
   "test": {
-    "model": "T1",
+    "model": "CT1",
     "rows": 499109,
-    "date": "2026-10-21",
-    "macroF1": 0.8577381515094958,
-    "accuracy": 0.9951493561526641,
-    "precision": 0.8468051690619737,
-    "recall": 0.8905623371227994,
-    "kappa": 0.9835602500068606,
-    "falseAlarms": 2218,
+    "date": "2026-10-26",
+    "freshIndependentTest": false,
+    "macroF1": 0.8731232373743235,
+    "accuracy": 0.9951733989970126,
+    "precision": 0.8548070999182472,
+    "recall": 0.9127275191289627,
+    "kappa": 0.9836411989531315,
+    "falseAlarms": 2213,
     "benignRows": 417513,
-    "falseAlarmRate": 0.005312409433957745,
+    "falseAlarmRate": 0.005300433758948823,
     "perClass": [
       {
         "label": "BENIGN",
         "support": 417513,
-        "precision": 0.9998483236148094,
-        "recall": 0.9946875905660423,
-        "f1": 0.9972612805584539
+        "precision": 0.9998483254406386,
+        "recall": 0.9946995662410512,
+        "f1": 0.9972673002944016
       },
       {
         "label": "Bot",
         "support": 442,
-        "precision": 0.4579339723109691,
-        "recall": 0.9728506787330317,
-        "f1": 0.6227371469949312
+        "precision": 0.4577540106951872,
+        "recall": 0.9683257918552036,
+        "f1": 0.6216412490922295
       },
       {
         "label": "DDoS",
         "support": 13190,
-        "precision": 0.9980300045461433,
-        "recall": 0.9986353297952995,
-        "f1": 0.9983325754130665
+        "precision": 0.9980301537995303,
+        "recall": 0.9987111448066717,
+        "f1": 0.9983705331767024
       },
       {
         "label": "DoS GoldenEye",
         "support": 1935,
-        "precision": 0.9474987617632491,
-        "recall": 0.9886304909560724,
-        "f1": 0.9676277187658068
+        "precision": 0.9521674140508222,
+        "recall": 0.9875968992248062,
+        "f1": 0.969558599695586
       },
       {
         "label": "DoS Hulk",
         "support": 30820,
-        "precision": 0.9997076023391813,
-        "recall": 0.9984101232965606,
-        "f1": 0.9990584415584416
+        "precision": 0.9996427527524276,
+        "recall": 0.9987021414665801,
+        "f1": 0.9991722257389103
       },
       {
         "label": "DoS Slowhttptest",
         "support": 1305,
-        "precision": 0.9483282674772037,
-        "recall": 0.9563218390804598,
-        "f1": 0.9523082792827166
+        "precision": 0.9475683890577508,
+        "recall": 0.9555555555555556,
+        "f1": 0.95154521175124
       },
       {
         "label": "DoS slowloris",
         "support": 692,
-        "precision": 0.9637377963737797,
+        "precision": 0.9664335664335665,
         "recall": 0.9985549132947977,
-        "f1": 0.9808374733853797
+        "f1": 0.9822316986496091
       },
       {
         "label": "FTP-Patator",
@@ -267,9 +283,9 @@
       {
         "label": "Infiltration",
         "support": 13,
-        "precision": 0.625,
-        "recall": 0.38461538461538464,
-        "f1": 0.47619047619047616
+        "precision": 0.6363636363636364,
+        "recall": 0.5384615384615384,
+        "f1": 0.5833333333333334
       },
       {
         "label": "PortScan",
@@ -281,16 +297,16 @@
       {
         "label": "SSH-Patator",
         "support": 705,
-        "precision": 1.0,
-        "recall": 0.9943262411347518,
-        "f1": 0.9971550497866287
+        "precision": 0.9985693848354793,
+        "recall": 0.9900709219858156,
+        "f1": 0.9943019943019943
       },
       {
         "label": "Web Attack – Brute Force",
         "support": 63,
-        "precision": 0.6825396825396826,
+        "precision": 0.7166666666666667,
         "recall": 0.6825396825396826,
-        "f1": 0.6825396825396826
+        "f1": 0.6991869918699187
       },
       {
         "label": "Web Attack – Sql Injection",
@@ -302,87 +318,10 @@
       {
         "label": "Web Attack – XSS",
         "support": 18,
-        "precision": 0.28125,
-        "recall": 0.5,
-        "f1": 0.36
+        "precision": 0.34285714285714286,
+        "recall": 0.6666666666666666,
+        "f1": 0.4528301886792453
       }
-    ]
-  },
-  "official": {
-    "eligibleRows": 1126067,
-    "scoredRows": 1126058,
-    "groups": 536179,
-    "heartbleedFlows": 9,
-    "arms": [
-      {
-        "id": "flow_analogs_15",
-        "title": "15 official flow analogs",
-        "features": 15,
-        "macroF1": 0.804194478857395,
-        "sd": 0.02977560263585859,
-        "falseAlarmRate": 0.0033092289257429,
-        "accuracy": 0.9939575555472544,
-        "kappa": 0.9729613966377645,
-        "fitSeconds": 145.6339316360004,
-        "predictionSeconds": 2.247846612000103,
-        "falseAlarms": 3154,
-        "errors": 6367
-      },
-      {
-        "id": "fuller_official",
-        "title": "77 official traffic measurements",
-        "features": 77,
-        "macroF1": 0.8198235744458914,
-        "sd": 0.014296044729177112,
-        "falseAlarmRate": 0.0011011465695906668,
-        "accuracy": 0.996710314890839,
-        "kappa": 0.9852635085963568,
-        "fitSeconds": 422.69566807200044,
-        "predictionSeconds": 3.0614562539999497,
-        "falseAlarms": 1057,
-        "errors": 3437
-      }
-    ],
-    "gain": 0.015629095588496345,
-    "pairedFoldGains": [
-      0.0046655106702425675,
-      0.03405485127328356,
-      0.008166924821962906
-    ],
-    "correctedErrors": 3107,
-    "introducedErrors": 177,
-    "rareClasses": [
-      {
-        "label": "Heartbleed",
-        "support": 0,
-        "f1": null
-      },
-      {
-        "label": "Infiltration",
-        "support": 25,
-        "f1": 0.0
-      },
-      {
-        "label": "Web Attack – Sql Injection",
-        "support": 5,
-        "f1": 0.0
-      },
-      {
-        "label": "Web Attack – XSS",
-        "support": 15,
-        "f1": 0.7367724867724869
-      }
-    ],
-    "notes": [
-      "Both feature sets use the same eligible official flow records and three saved training folds.",
-      "Fixed T1 settings: 80 trees, depth 20, minimum leaf size 2, balanced weights, seed 42, two CPU workers.",
-      "Median imputation and class weights are fitted using only the current fitting side.",
-      "The 15 flow analogs approximate our design on official flows; they are different inputs from T1’s custom windows.",
-      "Three folds show a consistent direction here; they do not establish statistical certainty.",
-      "The cohort is filtered. Its scores describe retained records, not the complete official dataset.",
-      "No replacement model was selected and the frozen T1 final test was not repeated.",
-      "False-alarm rates shown here are unweighted fold means; counts below are pooled across folds.",
-      "Prediction time includes imputation, uses three repeats after a warm-up, and excludes loading, feature construction, and scoring."
     ]
   },
   "classSupport": [
@@ -479,7 +418,7 @@
   ],
   "provenance": {
     "sourceRevision": "5170ec1458c05dd8fe230cccb157a52af47fb1b4",
-    "reviewedDate": "2026-10-23",
+    "reviewedDate": "2026-10-26",
     "sourceRepository": "https://github.com/xtian413/CICIDS2017-Attack-Classification"
   }
 }

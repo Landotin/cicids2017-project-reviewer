@@ -49,45 +49,27 @@ def make_facts():
                            validationAccuracy=number(v['validation_accuracy']),
                            validationFalseAlarmRate=number(v['validation_false_alarm_rate']),
                            cvMacroF1=number(cv.get('cv_macro_f1_mean')),
-                           cvSd=number(cv.get('cv_macro_f1_std')), selected=name == 'T1',
+                           cvSd=number(cv.get('cv_macro_f1_std')), selected=False,
                            notes='CV Not run: this trial was not shortlisted.' if name in ('W1', 'T2')
                            else 'All models use 80 trees and seed 42.'))
-    metrics = rows('final_test_metrics.csv')[0]
-    test = dict(model='T1', rows=499109, date='2026-10-21',
+    decision = json.loads((ROOT / 'evidence/ct1_decision.json').read_text())
+    models.append(dict(name='CT1', features=19,
+        featureDescription='15 extracted measurements + 4 calculated direction relationships',
+        weight='Balanced', depth=20, leaf=2,
+        validationMacroF1=decision['metrics']['validation_macro_f1'],
+        validationAccuracy=decision['metrics']['validation_accuracy'],
+        validationFalseAlarmRate=decision['metrics']['validation_false_alarm_rate'],
+        cvMacroF1=decision['metrics']['cv_macro_f1_mean'], cvSd=decision['metrics']['cv_macro_f1_std'],
+        selected=True, notes='Selected before CT1 test scoring; same original training partition.'))
+    metrics = rows('ct1_test_metrics.csv')[0]
+    test = dict(model='CT1', rows=499109, date='2026-10-26', freshIndependentTest=False,
                 macroF1=number(metrics['supported_class_macro_f1']), accuracy=number(metrics['accuracy']),
                 precision=number(metrics['supported_class_macro_precision']),
                 recall=number(metrics['supported_class_macro_recall']), kappa=number(metrics['kappa']),
                 falseAlarms=int(metrics['benign_false_alarms']), benignRows=int(metrics['benign_rows']),
                 falseAlarmRate=number(metrics['benign_false_alarm_rate']),
                 perClass=[dict(label=r['label'], support=int(r['support']), precision=number(r['precision']),
-                               recall=number(r['recall']), f1=number(r['f1'])) for r in rows('final_test_per_class.csv')])
-    official_arms = []
-    for r in rows('official_summary.csv'):
-        official_arms.append(dict(id=r['arm'], title='15 official flow analogs' if r['arm'] == 'flow_analogs_15'
-                                  else '77 official traffic measurements', features=15 if r['arm'] == 'flow_analogs_15' else 77,
-                                  macroF1=number(r['mean_macro_f1']), sd=number(r['sample_sd_macro_f1']),
-                                  falseAlarmRate=number(r['mean_fold_false_alarm_rate']), accuracy=number(r['mean_accuracy']),
-                                  kappa=number(r['mean_kappa']), fitSeconds=number(r['total_fit_seconds']),
-                                  predictionSeconds=number(r['median_of_fold_prediction_medians']),
-                                  falseAlarms=int(float(r['pooled_false_alarms'])), errors=int(float(r['pooled_errors']))))
-    rare_labels = {'Infiltration', 'Web Attack – Sql Injection', 'Heartbleed', 'Web Attack – XSS'}
-    official = dict(eligibleRows=1126067, scoredRows=1126058, groups=536179, heartbleedFlows=9,
-                    arms=official_arms, gain=official_arms[1]['macroF1'] - official_arms[0]['macroF1'],
-                    pairedFoldGains=[number(r['fuller_minus_analogs_macro_f1']) for r in rows('official_paired_folds.csv')],
-                    correctedErrors=3107, introducedErrors=177,
-                    rareClasses=[dict(label=r['label'], support=int(r['held_out_rows']), f1=number(r['fuller_official']))
-                                 for r in rows('official_class_f1.csv') if r['label'] in rare_labels],
-                    notes=[
-                        'Both feature sets use the same eligible official flow records and three saved training folds.',
-                        'Fixed T1 settings: 80 trees, depth 20, minimum leaf size 2, balanced weights, seed 42, two CPU workers.',
-                        'Median imputation and class weights are fitted using only the current fitting side.',
-                        'The 15 flow analogs approximate our design on official flows; they are different inputs from T1’s custom windows.',
-                        'Three folds show a consistent direction here; they do not establish statistical certainty.',
-                        'The cohort is filtered. Its scores describe retained records, not the complete official dataset.',
-                        'No replacement model was selected and the frozen T1 final test was not repeated.',
-                        'False-alarm rates shown here are unweighted fold means; counts below are pooled across folds.',
-                        'Prediction time includes imputation, uses three repeats after a warm-up, and excludes loading, feature construction, and scoring.',
-                    ])
+                               recall=number(r['recall']), f1=number(r['f1'])) for r in rows('ct1_test_per_class.csv')])
     support = [dict(label=r['class'], train=int(r['train']), validation=int(r['validation']), test=int(r['test']))
                for r in rows('class_support.csv')]
     return dict(
@@ -102,7 +84,7 @@ def make_facts():
                    parts=[dict(name=r['partition'], rows=int(r['rows']), share=float(r['actual_share_pct']) / 100)
                           for r in rows('partition_summary.csv')],
                    heartbleedPolicy='All 20 custom Heartbleed windows belong to one conversation and stay on fitting sides. Independent validation/test scores are N/A.'),
-        models=models, test=test, official=official, classSupport=support,
+        models=models, test=test, classSupport=support,
         provenance=dict(sourceRevision=provenance['source_revision'], reviewedDate=provenance['reviewed_date'],
                         sourceRepository=provenance['source_repository']))
 
@@ -140,12 +122,9 @@ def validate(content, facts, template):
     assert sum(r['support'] > 0 for r in facts['test']['perClass']) == facts['dataset']['evaluatedClasses']
     heart = next(p for p in facts['test']['perClass'] if p['label'] == 'Heartbleed')
     assert heart['support'] == 0 and heart['f1'] is None
-    assert next(m for m in facts['models'] if m['selected'])['name'] == 'T1'
+    assert next(m for m in facts['models'] if m['selected'])['name'] == 'CT1'
     assert [m['name'] for m in facts['models'] if m['cvMacroF1'] is None] == ['W1', 'T2']
     assert math.isclose(facts['test']['macroF1'], sum(r['f1'] for r in facts['test']['perClass'] if r['support']) / 14)
-    assert facts['official']['scoredRows'] + facts['official']['heartbleedFlows'] == facts['official']['eligibleRows']
-    assert all(g > 0 for g in facts['official']['pairedFoldGains'])
-    assert math.isclose(sum(facts['official']['pairedFoldGains']) / 3, facts['official']['gain'])
     assert template.count('<!-- REVIEWER_DATA -->') == 1
     assert not re.search(r'<(?:script|iframe)\b[^>]*\bsrc\s*=', template, re.I), 'No external scripts/frames'
     assert not re.search(r'\bfetch\s*\(', template), 'Offline content must not need fetch'
@@ -175,19 +154,15 @@ def main():
     assert ct1['independent_test_evaluated'] is False
     gain = (float(cv['CT1']['cv_macro_f1_mean']) - float(cv['T1']['cv_macro_f1_mean'])) * 100
     followup = f"""<article class="paper-card result-card" id="ct1-followup">
-      <p class="kicker">Later follow-up · reviewed 26 October 2026</p>
-      <h3>What happened when we combined C's inputs with T1's settings?</h3>
-      <p>We trained a new model called <strong>C+T1 (CT1)</strong>: the same fifteen window measurements plus C's four calculated relationships, using T1's deeper forest. This combines a feature design and settings, not two saved model files.</p>
-      <div class="table-wrap" tabindex="0" role="region" aria-label="Follow-up CV comparison">
-      <table><thead><tr><th>Model</th><th>Inputs</th><th>Mean grouped CV Macro F1</th><th>Variation (sample SD)</th></tr></thead><tbody>
-      <tr><td>T1</td><td>15</td><td>{float(cv['T1']['cv_macro_f1_mean'])*100:.2f}%</td><td>{float(cv['T1']['cv_macro_f1_std'])*100:.2f} percentage points</td></tr>
-      <tr><td>C+T1</td><td>19</td><td>{float(cv['CT1']['cv_macro_f1_mean'])*100:.2f}%</td><td>{float(cv['CT1']['cv_macro_f1_std'])*100:.2f} percentage points</td></tr>
-      </tbody></table></div>
-      <p><strong>What it means:</strong> C+T1 gained {gain:.2f} percentage points on average, improved two folds and slightly declined on one. It is the preferred candidate in this follow-up, but three folds do not establish a reliable improvement or the best possible feature count.</p>
-      <p>Its existing-validation Macro F1 was <strong>{ct1['metrics']['validation_macro_f1']*100:.2f}%</strong>, versus T1's 77.75%. Validation had already informed development. Infiltration and XSS remained weak, SQL Injection scored zero F1 on two rows, and Heartbleed remains N/A.</p>
-      <p><strong>Keep the evidence separate:</strong> T1 still owns the historical 85.77% final-test Macro F1 below. C+T1 has no independent test result. The old test was not loaded or scored again.</p>
-      <p><a href="https://cicids2017-model-demo.streamlit.app/">Try the live model demonstration</a> · <a href="https://github.com/Landotin/cicids2017-model-demo">Code, models and 31 real example rows</a>. Both hosted model downloads matched every recorded example prediction; a local fallback is also included.</p>
-      <details><summary>Show the follow-up evidence</summary><p><a href="evidence/ct1_cv_comparison.csv">Same-fold comparison</a> · <a href="evidence/ct1_paired_folds.csv">Changes in each fold</a> · <a href="evidence/ct1_validation_class_metrics.csv">Validation class scores and support</a> · <a href="evidence/ct1_decision.json">Recorded follow-up decision</a></p></details>
+      <p class="kicker">Selected study model · reviewed 26 October 2026</p>
+      <h3>Combine extracted measurements with calculated relationships</h3>
+      <p>The selected model, C+T1 (CT1), uses fifteen extracted window measurements plus four calculated relationships, with 80 trees, depth 20 and minimum leaf size 2. It combines a feature design and settings, not two model files.</p>
+      <p>Mean grouped CV Macro F1: <strong>72.30%</strong> (sample SD 7.57 percentage points), versus 71.43% for the earlier fifteen-input T1. The gain is {gain:.2f} percentage points across three folds and is not proof of a reliable general improvement.</p>
+      <p><strong>Test result: 87.31% Macro F1 and 99.52% accuracy.</strong> All 499,109 test prediction identities and 225 matrix cells passed review. The saved model was not refitted or tuned.</p>
+      <p><strong>Limit:</strong> this test was previously examined for T1 before CT1 was developed. CT1 was not trained on test rows, and its choice predates its own scoring, but this is not a fresh independent test. Historical T1 scored 85.77%; that earlier number remains unchanged. No new settings or model choice use these test scores.</p>
+      <p>The official-flow comparison is outside the current study/report. Its original evidence files are retained as history, not active findings.</p>
+      <p><a href="https://cicids2017-model-demo.streamlit.app/">Try the saved-model demonstration</a> · <a href="https://github.com/Landotin/cicids2017-model-demo">Public code and selected validation examples</a>.</p>
+      <details><summary>Show supporting evidence</summary><p><a href="evidence/ct1_cv_comparison.csv">Same-fold comparison</a> · <a href="evidence/ct1_test_metrics.csv">Measured test metrics</a> · <a href="evidence/ct1_test_per_class.csv">Class scores/support</a> · <a href="evidence/ct1_test_complete.json">Completion and model identity</a> · <a href="evidence/ct1_test_supervisor_review.json">Prediction review</a></p></details>
       </article>"""
     html = template.replace('<!-- REVIEWER_DATA -->', data).replace('<!-- CT1_FOLLOWUP -->', followup)
     for relative, expected in [('src/facts.json', facts_text), ('index.html', html)]:
