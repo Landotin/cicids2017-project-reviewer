@@ -1,0 +1,26 @@
+{
+  "reviewed_date": "2026-10-26",
+  "status": "preferred_exploratory_followup",
+  "model": "CT1",
+  "ranking_scope": [
+    "B",
+    "C",
+    "T1",
+    "CT1"
+  ],
+  "primary_measure": "mean grouped supported-class Macro F1",
+  "independent_test_evaluated": false,
+  "historical_t1_choice_unchanged": true,
+  "model_sha256": "0dfa9fef07f16ecd36f7af7255e390d515842e4367af86da022a4e43c5318492",
+  "metrics": {
+    "cv_false_alarm_rate_mean": 0.018028603577717957,
+    "cv_macro_f1_mean": 0.722988840889803,
+    "cv_macro_f1_std": 0.07571507433871208,
+    "test_status": "not_evaluated",
+    "validation_accuracy": 0.9949568426099066,
+    "validation_false_alarm_rate": 0.00563152253483474,
+    "validation_macro_f1": 0.7803373075284699,
+    "validation_rows": 481841
+  },
+  "reason": "Highest mean Macro F1 under the approved same-fold ranking rule; modest three-fold gain."
+}

@@ -3,7 +3,7 @@
     "title": "CICIDS2017 Project Reviewer",
     "subtitle": "A plain-language guide to the data, saved model, evidence, and limits",
     "reviewedDate": "2026-10-23",
-    "updatedDate": "2026-10-25"
+    "updatedDate": "2026-10-26"
   },
   "project": {
     "headline": "Can a Random Forest recognize attack patterns in network traffic?",
@@ -430,7 +430,7 @@
       "why": "A single high score can hide weak detection on rare attacks, and different row units or cohorts cannot be treated as a direct ranking.",
       "input": "Reviewed aggregate tables, schema checks, saved model results, and source documentation.",
       "output": "A bounded conclusion: strong results on many larger classes, with remaining errors and limited evidence for rare classes.",
-      "finding": "T1's Bot precision was 45.79%, Infiltration F1 was 47.62% on 13 rows, XSS F1 was 36.00% on 18, and Heartbleed was N/A.",
+      "finding": "T1's Bot precision was 45.79%, Infiltration F1 was 47.62% on 13 rows, XSS F1 was 36.00% on 18, and Heartbleed was N/A. A later follow-up combined C’s four added values with T1’s settings. CT1 reached 72.30% mean grouped CV Macro F1 versus T1’s 71.43%, and 78.03% validation Macro F1. It is the preferred exploratory follow-up, with no independent test. The gain is small and rare-class weaknesses remain.",
       "spoken": "We report what the saved measurements show and keep small support, fold variation, and source gaps beside the headline scores.",
       "details": [
         "Accuracy counts correct rows and can be driven by the large BENIGN class.",
@@ -868,6 +868,18 @@
       "url": "https://colab.research.google.com/drive/1boNZOlTeAckcKQHqhOzQReeSyWgTIZsK",
       "access": "project",
       "why": "The completed notebook for the separate official-flow comparison; project access may be required."
+    },
+    {
+      "title": "C+T1 follow-up results and runnable demo",
+      "url": "https://github.com/Landotin/cicids2017-model-demo",
+      "access": "public",
+      "why": "Reviewed 19-input follow-up, model identities, 31 real validation examples and local demo instructions. Hosting setup is still pending."
+    },
+    {
+      "title": "C+T1 same-fold comparison",
+      "url": "https://landotin.github.io/cicids2017-project-reviewer/evidence/ct1_cv_comparison.csv",
+      "access": "public",
+      "why": "Aggregate CV comparison of B, C, T1 and CT1; historical timing values use a different runtime and did not decide ranking."
     }
   ]
 }

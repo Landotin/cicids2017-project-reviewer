@@ -73,6 +73,29 @@
       "file": "schema_checks.csv",
       "source_path": "results/official_features/Schema/schema_checks.csv",
       "sha256": "0aff1dfcf8dd0fb38d2c8cdc17ce102668b7c9abb2c3c87ca2d1e80f19b1f122"
+    },
+    {
+      "file": "ct1_cv_comparison.csv",
+      "source_path": "Reviewed CT1 run handoff and decision, 26 October 2026",
+      "sha256": "3d68a19346d0989720db923552b0c87506cd8333cb4169f902705ef637443d96"
+    },
+    {
+      "file": "ct1_paired_folds.csv",
+      "source_path": "Reviewed CT1 run handoff and decision, 26 October 2026",
+      "sha256": "eac4206f28b9f610cd68a609ffc631ad81fffc11752df5306fe5f8a51d3fc376"
+    },
+    {
+      "file": "ct1_validation_class_metrics.csv",
+      "source_path": "Reviewed CT1 run handoff and decision, 26 October 2026",
+      "sha256": "61535c7e6e73a455995d58b169696cdd48b8ee134d7ba2b0a02cc31a9a576e5a"
+    },
+    {
+      "file": "ct1_decision.json",
+      "source_path": "Reviewed CT1 run handoff and decision, 26 October 2026",
+      "sha256": "759ee01c9a84102d8ee7c51190e3bf9c471ba2418164ce91ee1c432ee9bbc9d1"
     }
-  ]
+  ],
+  "followup_reviewed_date": "2026-10-26",
+  "followup_source_repository": "https://github.com/Landotin/cicids2017-model-demo",
+  "followup_source_revision": "a3be22f"
 }

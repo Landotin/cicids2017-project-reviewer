@@ -169,7 +169,27 @@ def main():
     result = validate(content, facts, template)
     data = '<script>\nwindow.REVIEWER_CONTENT = ' + json.dumps(content, ensure_ascii=False, allow_nan=False).replace('</', '<\\/')
     data += ';\nwindow.REVIEWER_FACTS = ' + json.dumps(facts, ensure_ascii=False, allow_nan=False).replace('</', '<\\/') + ';\n</script>'
-    html = template.replace('<!-- REVIEWER_DATA -->', data)
+    ct1 = json.loads((ROOT / 'evidence/ct1_decision.json').read_text())
+    cv = {row['model']: row for row in rows('ct1_cv_comparison.csv')}
+    assert math.isclose(ct1['metrics']['cv_macro_f1_mean'], float(cv['CT1']['cv_macro_f1_mean']))
+    assert ct1['independent_test_evaluated'] is False
+    gain = (float(cv['CT1']['cv_macro_f1_mean']) - float(cv['T1']['cv_macro_f1_mean'])) * 100
+    followup = f"""<article class="paper-card result-card" id="ct1-followup">
+      <p class="kicker">Later follow-up · reviewed 26 October 2026</p>
+      <h3>What happened when we combined C's inputs with T1's settings?</h3>
+      <p>We trained a new model called <strong>C+T1 (CT1)</strong>: the same fifteen window measurements plus C's four calculated relationships, using T1's deeper forest. This combines a feature design and settings, not two saved model files.</p>
+      <div class="table-wrap" tabindex="0" role="region" aria-label="Follow-up CV comparison">
+      <table><thead><tr><th>Model</th><th>Inputs</th><th>Mean grouped CV Macro F1</th><th>Variation (sample SD)</th></tr></thead><tbody>
+      <tr><td>T1</td><td>15</td><td>{float(cv['T1']['cv_macro_f1_mean'])*100:.2f}%</td><td>{float(cv['T1']['cv_macro_f1_std'])*100:.2f} percentage points</td></tr>
+      <tr><td>C+T1</td><td>19</td><td>{float(cv['CT1']['cv_macro_f1_mean'])*100:.2f}%</td><td>{float(cv['CT1']['cv_macro_f1_std'])*100:.2f} percentage points</td></tr>
+      </tbody></table></div>
+      <p><strong>What it means:</strong> C+T1 gained {gain:.2f} percentage points on average, improved two folds and slightly declined on one. It is the preferred candidate in this follow-up, but three folds do not establish a reliable improvement or the best possible feature count.</p>
+      <p>Its existing-validation Macro F1 was <strong>{ct1['metrics']['validation_macro_f1']*100:.2f}%</strong>, versus T1's 77.75%. Validation had already informed development. Infiltration and XSS remained weak, SQL Injection scored zero F1 on two rows, and Heartbleed remains N/A.</p>
+      <p><strong>Keep the evidence separate:</strong> T1 still owns the historical 85.77% final-test Macro F1 below. C+T1 has no independent test result. The old test was not loaded or scored again.</p>
+      <p><a href="https://github.com/Landotin/cicids2017-model-demo">Open the runnable demo, models and 31 real example rows</a> · Public hosting is awaiting account setup; local run instructions are ready.</p>
+      <details><summary>Show the follow-up evidence</summary><p><a href="evidence/ct1_cv_comparison.csv">Same-fold comparison</a> · <a href="evidence/ct1_paired_folds.csv">Changes in each fold</a> · <a href="evidence/ct1_validation_class_metrics.csv">Validation class scores and support</a> · <a href="evidence/ct1_decision.json">Recorded follow-up decision</a></p></details>
+      </article>"""
+    html = template.replace('<!-- REVIEWER_DATA -->', data).replace('<!-- CT1_FOLLOWUP -->', followup)
     for relative, expected in [('src/facts.json', facts_text), ('index.html', html)]:
         path = ROOT / relative
         if args.check:
